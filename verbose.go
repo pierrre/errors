@@ -37,3 +37,18 @@ func VerboseString(err error) string {
 	Verbose(&b, err)
 	return b.String()
 }
+
+// VerboseFormatter returns a fmt.Formatter that writes the error's verbose message.
+func VerboseFormatter(err error) fmt.Formatter {
+	return &verboseFormatter{
+		error: err,
+	}
+}
+
+type verboseFormatter struct {
+	error error
+}
+
+func (f *verboseFormatter) Format(s fmt.State, verb rune) {
+	Verbose(s, f.error)
+}

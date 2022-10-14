@@ -63,7 +63,7 @@ frames := errors.StackFrames(err)
 The error verbose message shows additional information about the error.
 Wrapping functions may provide a verbose message (stack, tag, value, etc.)
 
-The [`Verbose`](https://pkg.go.dev/github.com/pierrre/errors#Verbose) and [`VerboseString`](https://pkg.go.dev/github.com/pierrre/errors#VerboseString) functions write/return the error verbose message.
+The [`Verbose`](https://pkg.go.dev/github.com/pierrre/errors#Verbose)/[`VerboseString`](https://pkg.go.dev/github.com/pierrre/errors#VerboseString)/[`VerboseFormatter`](https://pkg.go.dev/github.com/pierrre/errors#VerboseFormatter) functions write/return/format the error verbose message.
 
 The first line is the error's message.
 The following lines are the verbose message of the error chain.
