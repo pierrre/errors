@@ -2,6 +2,7 @@ package errval
 
 import (
 	"bytes"
+	"fmt"
 	"testing"
 
 	"github.com/pierrre/errors"
@@ -72,4 +73,12 @@ func TestVerbose(t *testing.T) {
 	if s != expected {
 		t.Fatalf("unexpected message: got %q, want %q", s, expected)
 	}
+}
+
+func Example() {
+	err := errors.New("error")
+	err = Wrap(err, "foo", "bar")
+	vals := Get(err)
+	fmt.Println(vals["foo"])
+	// Output: bar
 }

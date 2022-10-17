@@ -2,6 +2,7 @@ package errors
 
 import (
 	"bytes"
+	"fmt"
 	"regexp"
 	"testing"
 )
@@ -70,4 +71,15 @@ func TestStackPCs(t *testing.T) {
 	if len(pcs) == 0 {
 		t.Fatal("no stack PCs")
 	}
+}
+
+func ExampleStack() {
+	err := New("error")
+	err = Stack(err)
+	fmt.Println(err)
+	sfs := StackFrames(err)
+	fmt.Println(len(sfs))
+	// Output:
+	// error
+	// 2
 }

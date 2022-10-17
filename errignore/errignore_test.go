@@ -2,6 +2,7 @@ package errignore
 
 import (
 	"bytes"
+	"fmt"
 	"testing"
 
 	"github.com/pierrre/errors"
@@ -65,4 +66,12 @@ func TestUnwrap(t *testing.T) {
 	if err2 != err1 { //nolint:errorlint // We want to compare the error.
 		t.Fatal("error not equal")
 	}
+}
+
+func Example() {
+	err := errors.New("error")
+	err = Wrap(err)
+	ignored := Is(err)
+	fmt.Println(ignored)
+	// Output: true
 }

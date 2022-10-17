@@ -21,6 +21,15 @@ func TestVerbose(t *testing.T) {
 	}
 }
 
+//nolint:testableexamples // The output contains a stack trace, which is not stable.
+func ExampleVerbose() {
+	err := New("error")
+	buf := new(strings.Builder)
+	Verbose(buf, err)
+	s := buf.String()
+	fmt.Println(s)
+}
+
 func TestVerboseString(t *testing.T) {
 	err := newBase("error")
 	err = &testVerbose{
@@ -31,6 +40,13 @@ func TestVerboseString(t *testing.T) {
 	if s != expected {
 		t.Fatalf("unexpected verbose message:\ngot: %q\nwant: %q", s, expected)
 	}
+}
+
+//nolint:testableexamples // The output contains a stack trace, which is not stable.
+func ExampleVerboseString() {
+	err := New("error")
+	s := VerboseString(err)
+	fmt.Println(s)
 }
 
 func TestVerboseFormatter(t *testing.T) {
@@ -46,6 +62,13 @@ func TestVerboseFormatter(t *testing.T) {
 	if s != expected {
 		t.Fatalf("unexpected verbose message:\ngot: %q\nwant: %q", s, expected)
 	}
+}
+
+//nolint:testableexamples // The output contains a stack trace, which is not stable.
+func ExampleVerboseFormatter() {
+	err := New("error")
+	f := VerboseFormatter(err)
+	fmt.Println(f)
 }
 
 type testVerbose struct {
