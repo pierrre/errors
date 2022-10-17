@@ -34,14 +34,23 @@ func (err *stack) Unwrap() error {
 	return err.error
 }
 
+// StackFrameVerboseWriter writes a runtime.Frame to an error verbose message.
+//
+// It must write a new line character at the end.
+//
+// It can be changed in order to customize how runtime.Frame are formatted.
+var StackFrameVerboseWriter = func(w io.Writer, f runtime.Frame) {
+	_, file := filepath.Split(f.File)
+	_, _ = fmt.Fprintf(w, "\t%s %s:%d\n", f.Function, file, f.Line)
+}
+
 func (err *stack) ErrorVerbose(w io.Writer) {
 	_, _ = io.WriteString(w, "stack\n")
 	fs := err.StackFrames()
 	for more := true; more; {
 		var f runtime.Frame
 		f, more = fs.Next()
-		_, file := filepath.Split(f.File)
-		_, _ = fmt.Fprintf(w, "\t%s %s:%d\n", f.Function, file, f.Line)
+		StackFrameVerboseWriter(w, f)
 	}
 }
 
