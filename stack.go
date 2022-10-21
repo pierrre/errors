@@ -54,6 +54,10 @@ func (err *stack) ErrorVerbose(w io.Writer) {
 	}
 }
 
+func (err *stack) StackPCs() []uintptr {
+	return err.callers
+}
+
 func (err *stack) StackFrames() *runtime.Frames {
 	return runtime.CallersFrames(err.callers)
 }

@@ -57,3 +57,17 @@ func TestStackVerbose(t *testing.T) {
 		t.Fatalf("unexpected verbose message:\ngot: %q\nwant match: %q", s, expectedRegexp)
 	}
 }
+
+func TestStackPCs(t *testing.T) {
+	err := newBase("error")
+	err = Stack(err)
+	var sErr *stack
+	ok := As(err, &sErr)
+	if !ok {
+		t.Fatal("not a stack")
+	}
+	pcs := sErr.StackPCs()
+	if len(pcs) == 0 {
+		t.Fatal("no stack PCs")
+	}
+}
