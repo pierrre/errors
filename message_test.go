@@ -1,6 +1,7 @@
 package errors
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -29,4 +30,18 @@ func TestMessageEmpty(t *testing.T) {
 	if s != expected {
 		t.Fatalf("unexpected message: got %q, want %q", s, expected)
 	}
+}
+
+func ExampleMessage() {
+	err := New("error")
+	err = Message(err, "message")
+	fmt.Println(err)
+	// Output: message: error
+}
+
+func ExampleMessagef() {
+	err := New("error")
+	err = Messagef(err, "message %s", "formatted")
+	fmt.Println(err)
+	// Output: message formatted: error
 }

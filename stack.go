@@ -11,6 +11,8 @@ import (
 // Stack adds a stack to an error.
 //
 // The verbose message contains the stack.
+//
+// See https://pkg.go.dev/runtime#Frames .
 func Stack(err error) error {
 	return stackSkip(err, 2)
 }
@@ -63,6 +65,8 @@ func (err *stack) StackFrames() *runtime.Frames {
 }
 
 // StackFrames returns the list of runtime.Frames associated to an error.
+//
+// See https://pkg.go.dev/runtime#Frames .
 func StackFrames(err error) []*runtime.Frames {
 	var fss []*runtime.Frames
 	for ; err != nil; err = Unwrap(err) {

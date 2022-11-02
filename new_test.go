@@ -1,6 +1,7 @@
 package errors
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -17,6 +18,12 @@ func TestNew(t *testing.T) {
 	}
 }
 
+func ExampleNew() {
+	err := New("error")
+	fmt.Println(err)
+	// Output: error
+}
+
 func TestNewf(t *testing.T) {
 	err := Newf("%s", "error")
 	s := err.Error()
@@ -28,4 +35,10 @@ func TestNewf(t *testing.T) {
 	if len(sfs) != 1 {
 		t.Fatalf("unexpected length: got %d, want %d", len(sfs), 1)
 	}
+}
+
+func ExampleNewf() {
+	err := Newf("error %s", "formatted")
+	fmt.Println(err)
+	// Output: error formatted
 }

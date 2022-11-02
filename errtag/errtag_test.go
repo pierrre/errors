@@ -2,6 +2,7 @@ package errtag
 
 import (
 	"bytes"
+	"fmt"
 	"testing"
 
 	"github.com/pierrre/errors"
@@ -17,6 +18,14 @@ func Test(t *testing.T) {
 	if tags["foo"] != "bar" {
 		t.Fatalf("unexpected tag: got %q, want %q", tags["foo"], "bar")
 	}
+}
+
+func Example() {
+	err := errors.New("error")
+	err = Wrap(err, "foo", "bar")
+	tags := Get(err)
+	fmt.Println(tags["foo"])
+	// Output: bar
 }
 
 func TestInt(t *testing.T) {
