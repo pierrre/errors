@@ -48,7 +48,7 @@ var StackFrameVerboseWriter = func(w io.Writer, f runtime.Frame) {
 
 func (err *stack) ErrorVerbose(w io.Writer) {
 	_, _ = io.WriteString(w, "stack\n")
-	fs := err.StackFrames()
+	fs := err.RuntimeStackFrames()
 	for more := true; more; {
 		var f runtime.Frame
 		f, more = fs.Next()
@@ -56,11 +56,21 @@ func (err *stack) ErrorVerbose(w io.Writer) {
 	}
 }
 
-func (err *stack) StackPCs() []uintptr {
+// StackFrames returns the list of PCs associated to the error.
+//
+// It exists and is named StackFrames in order to be compatible with the Sentry library, which expects this name.
+//
+// There is no stability guarantee for this method.
+func (err *stack) StackFrames() []uintptr {
 	return err.callers
 }
 
-func (err *stack) StackFrames() *runtime.Frames {
+// RuntimeStackFrames returns the runtime.Frames associated to the error.
+//
+// It should be named StackFrames, but it was not possible because of the compatibility with the Sentry library.
+//
+// There is no stability guarantee for this method.
+func (err *stack) RuntimeStackFrames() *runtime.Frames {
 	return runtime.CallersFrames(err.callers)
 }
 
@@ -72,7 +82,7 @@ func StackFrames(err error) []*runtime.Frames {
 	for ; err != nil; err = Unwrap(err) {
 		err, ok := err.(*stack) //nolint:errorlint // We want to compare the current error.
 		if ok {
-			fs := err.StackFrames()
+			fs := err.RuntimeStackFrames()
 			fss = append(fss, fs)
 		}
 	}
