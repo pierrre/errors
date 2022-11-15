@@ -59,7 +59,7 @@ func TestStackVerbose(t *testing.T) {
 	}
 }
 
-func TestStackPCs(t *testing.T) {
+func TestStackFrames(t *testing.T) {
 	err := newBase("error")
 	err = Stack(err)
 	var sErr *stack
@@ -67,7 +67,7 @@ func TestStackPCs(t *testing.T) {
 	if !ok {
 		t.Fatal("not a stack")
 	}
-	pcs := sErr.StackPCs()
+	pcs := sErr.StackFrames()
 	if len(pcs) == 0 {
 		t.Fatal("no stack PCs")
 	}
