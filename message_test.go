@@ -7,7 +7,7 @@ import (
 
 func TestMessage(t *testing.T) {
 	err := New("error")
-	err = Messagef(err, "%s", "test")
+	err = Message(err, "test")
 	s := err.Error()
 	expected := "test: error"
 	if s != expected {
@@ -37,11 +37,4 @@ func ExampleMessage() {
 	err = Message(err, "message")
 	fmt.Println(err)
 	// Output: message: error
-}
-
-func ExampleMessagef() {
-	err := New("error")
-	err = Messagef(err, "message %s", "formatted")
-	fmt.Println(err)
-	// Output: message formatted: error
 }

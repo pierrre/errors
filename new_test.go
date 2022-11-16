@@ -23,22 +23,3 @@ func ExampleNew() {
 	fmt.Println(err)
 	// Output: error
 }
-
-func TestNewf(t *testing.T) {
-	err := Newf("%s", "error")
-	s := err.Error()
-	expected := "error"
-	if s != expected {
-		t.Fatalf("unexpected message: got %q, want %q", s, expected)
-	}
-	sfs := StackFrames(err)
-	if len(sfs) != 1 {
-		t.Fatalf("unexpected length: got %d, want %d", len(sfs), 1)
-	}
-}
-
-func ExampleNewf() {
-	err := Newf("error %s", "formatted")
-	fmt.Println(err)
-	// Output: error formatted
-}
