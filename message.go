@@ -10,7 +10,7 @@ import (
 //
 // If the given message is empty, the returned error is the given error.
 //
-// // Use fmt.Sprintf() to format the message.
+// Use fmt.Sprintf() to format the message.
 func Message(err error, msg string) error {
 	if err == nil {
 		return nil
