@@ -42,7 +42,9 @@ func (err *temporary) Temporary() bool {
 //
 // By default, an error is temporary.
 func Is(err error) bool {
-	var werr *temporary
+	var werr interface {
+		Temporary() bool
+	}
 	ok := errors.As(err, &werr)
 	if ok {
 		return werr.Temporary()

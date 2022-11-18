@@ -40,7 +40,9 @@ func (err *ignore) Ignored() bool {
 //
 // By default, an error is not ignored.
 func Is(err error) bool {
-	var werr *ignore
+	var werr interface {
+		Ignored() bool
+	}
 	ok := errors.As(err, &werr)
 	if ok {
 		return werr.Ignored()

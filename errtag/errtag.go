@@ -67,7 +67,9 @@ func (err *tag) Tag() (key string, val string) {
 func Get(err error) map[string]string {
 	tags := make(map[string]string)
 	for ; err != nil; err = errors.Unwrap(err) {
-		err, ok := err.(*tag) //nolint:errorlint // We want to compare the current error.
+		err, ok := err.(interface { //nolint:errorlint // We want to compare the current error.
+			Tag() (key string, val string)
+		})
 		if !ok {
 			continue
 		}

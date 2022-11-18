@@ -56,7 +56,9 @@ func (err *value) Value() (key string, val any) {
 func Get(err error) map[string]any {
 	vals := make(map[string]any)
 	for ; err != nil; err = errors.Unwrap(err) {
-		err, ok := err.(*value) //nolint:errorlint // We want to compare the current error.
+		err, ok := err.(interface { //nolint:errorlint // We want to compare the current error.
+			Value() (key string, val any)
+		})
 		if !ok {
 			continue
 		}

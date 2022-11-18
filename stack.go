@@ -80,7 +80,9 @@ func (err *stack) RuntimeStackFrames() *runtime.Frames {
 func StackFrames(err error) []*runtime.Frames {
 	var fss []*runtime.Frames
 	for ; err != nil; err = Unwrap(err) {
-		err, ok := err.(*stack) //nolint:errorlint // We want to compare the current error.
+		err, ok := err.(interface { //nolint:errorlint // We want to compare the current error.
+			RuntimeStackFrames() *runtime.Frames
+		})
 		if ok {
 			fs := err.RuntimeStackFrames()
 			fss = append(fss, fs)
@@ -97,7 +99,9 @@ func ensureStack(err error, skip int) error {
 }
 
 func hasStack(err error) bool {
-	var werr *stack
+	var werr interface {
+		RuntimeStackFrames() *runtime.Frames
+	}
 	return As(err, &werr)
 }
 
