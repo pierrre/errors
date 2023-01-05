@@ -130,3 +130,29 @@ func TestVerbose(t *testing.T) {
 		t.Fatalf("unexpected message: got %q, want %q", s, expected)
 	}
 }
+
+func TestJoin(t *testing.T) {
+	err := Wrap(
+		errors.Join(
+			Wrap(
+				errors.New("error"),
+				"foo",
+				"baz",
+			),
+			Wrap(
+				errors.New("error"),
+				"aaa",
+				"bbb",
+			),
+		),
+		"foo",
+		"bar",
+	)
+	tags := Get(err)
+	if tags["foo"] != "bar" {
+		t.Fatalf("unexpected tag: got %q, want %q", tags["foo"], "bar")
+	}
+	if tags["aaa"] != "bbb" {
+		t.Fatalf("unexpected tag: got %q, want %q", tags["aaa"], "bbb")
+	}
+}

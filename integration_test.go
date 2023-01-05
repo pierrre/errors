@@ -12,7 +12,10 @@ import (
 )
 
 func TestIntegration(t *testing.T) {
-	err := errors.New("error")
+	err := errors.Join(
+		errors.New("error a"),
+		errors.New("error b"),
+	)
 	err = errors.Wrap(err, "test")
 	err = errignore.Wrap(err)
 	err = errtmp.Wrap(err, true)
@@ -20,22 +23,22 @@ func TestIntegration(t *testing.T) {
 	err = errval.Wrap(err, "c", "d")
 	t.Run("Error", func(t *testing.T) {
 		s := err.Error()
-		expected := "test: error"
+		expected := "test: error a\nerror b"
 		if s != expected {
 			t.Fatalf("unexpected message: got %q, want %q", s, expected)
 		}
 	})
 	t.Run("Verbose", func(t *testing.T) {
 		s := errors.VerboseString(err)
-		expected := regexp.MustCompile(`^test: error\nvalue c = d\ntag a = b\ntemporary = true\nignored\nstack\n(\t.+ .+:\d+\n)+$`)
+		expected := regexp.MustCompile(`^test: error a\nerror b\nvalue c = d\ntag a = b\ntemporary = true\nignored\n\nSub error 0: error a\nstack\n(\t.+ .+:\d+\n)+\nSub error 1: error b\nstack\n(\t.+ .+:\d+\n)+$`)
 		if !expected.MatchString(s) {
 			t.Fatalf("unexpected verbose message:\ngot: %q\nwant match: %q", s, expected)
 		}
 	})
 	t.Run("Stack", func(t *testing.T) {
 		fs := errors.StackFrames(err)
-		if len(fs) != 1 {
-			t.Fatalf("unexpected stack frames length: got %d, want 1", len(fs))
+		if len(fs) != 2 {
+			t.Fatalf("unexpected stack frames length: got %d, want %d", len(fs), 2)
 		}
 	})
 	t.Run("Ignore", func(t *testing.T) {

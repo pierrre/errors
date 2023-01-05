@@ -117,7 +117,7 @@ lint-rules: ensure-command-pcregrep
 	! pcregrep -rn --include=".+\.go$$" "^\t+var \($$" .
 
 	# Use Go 1.19 in go.mod.
-	! pcregrep -n "^go " go.mod | pcregrep -v "go 1.19$$"
+	! pcregrep -n "^go " go.mod | pcregrep -v "go 1.20$$"
 
 .PHONY: mod-update
 mod-update:

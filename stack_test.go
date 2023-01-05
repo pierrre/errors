@@ -73,6 +73,23 @@ func TestStackFrames(t *testing.T) {
 	}
 }
 
+func TestStackJoin(t *testing.T) {
+	err := Stack(
+		Join(
+			Stack(
+				newBase("error 1"),
+			),
+			Stack(
+				newBase("error 2"),
+			),
+		),
+	)
+	sfs := StackFrames(err)
+	if len(sfs) != 3 {
+		t.Fatalf("unexpected length: got %d, want %d", len(sfs), 3)
+	}
+}
+
 func ExampleStack() {
 	err := New("error")
 	err = Stack(err)
