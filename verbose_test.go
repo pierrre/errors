@@ -78,3 +78,73 @@ type testVerbose struct {
 func (v *testVerbose) ErrorVerbose(w io.Writer) {
 	_, _ = io.WriteString(w, "verbose\n")
 }
+
+func (v *testVerbose) Unwrap() error {
+	return v.error
+}
+
+func TestVerboseJoin(t *testing.T) {
+	err := &testVerbose{
+		error: Message(
+			Join(
+				&testVerbose{
+					error: Message(
+						Join(
+							&testVerbose{
+								error: newBase("error a"),
+							},
+							&testVerbose{
+								error: newBase("error b"),
+							},
+						),
+						"ab",
+					),
+				},
+				&testVerbose{
+					error: Message(
+						Join(
+							&testVerbose{
+								error: newBase("error c"),
+							},
+							&testVerbose{
+								error: newBase("error d"),
+							},
+						),
+						"cd",
+					),
+				},
+			),
+			"abcd",
+		),
+	}
+	s := VerboseString(err)
+	expected := `abcd: ab: error a
+error b
+cd: error c
+error d
+verbose
+
+Sub error 0: ab: error a
+error b
+verbose
+
+Sub error 0.0: error a
+verbose
+
+Sub error 0.1: error b
+verbose
+
+Sub error 1: cd: error c
+error d
+verbose
+
+Sub error 1.0: error c
+verbose
+
+Sub error 1.1: error d
+verbose
+`
+	if s != expected {
+		t.Fatalf("unexpected verbose message:\ngot: %q\nwant: %q", s, expected)
+	}
+}
