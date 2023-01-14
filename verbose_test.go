@@ -5,10 +5,12 @@ import (
 	"io"
 	"strings"
 	"testing"
+
+	"github.com/pierrre/errors/errbase"
 )
 
 func TestVerbose(t *testing.T) {
-	err := newBase("error")
+	err := errbase.New("error")
 	err = &testVerbose{
 		error: err,
 	}
@@ -31,7 +33,7 @@ func ExampleVerbose() {
 }
 
 func TestVerboseString(t *testing.T) {
-	err := newBase("error")
+	err := errbase.New("error")
 	err = &testVerbose{
 		error: err,
 	}
@@ -50,7 +52,7 @@ func ExampleVerboseString() {
 }
 
 func TestVerboseFormatter(t *testing.T) {
-	err := newBase("error")
+	err := errbase.New("error")
 	err = &testVerbose{
 		error: err,
 	}

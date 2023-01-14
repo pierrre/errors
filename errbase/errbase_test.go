@@ -1,11 +1,11 @@
-package errors
+package errbase
 
 import (
 	"testing"
 )
 
-func TestBase(t *testing.T) {
-	err := newBase("error")
+func Test(t *testing.T) {
+	err := New("error")
 	s := err.Error()
 	expected := "error"
 	if s != expected {

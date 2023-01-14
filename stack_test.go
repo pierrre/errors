@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"regexp"
 	"testing"
+
+	"github.com/pierrre/errors/errbase"
 )
 
 func TestStack(t *testing.T) {
-	err := newBase("error")
+	err := errbase.New("error")
 	err = Stack(err)
 	sfs := StackFrames(err)
 	if len(sfs) != 1 {
@@ -33,7 +35,7 @@ func TestStackNil(t *testing.T) {
 }
 
 func TestStackError(t *testing.T) {
-	err := newBase("error")
+	err := errbase.New("error")
 	err = Stack(err)
 	s := err.Error()
 	expected := "error"
@@ -43,7 +45,7 @@ func TestStackError(t *testing.T) {
 }
 
 func TestStackVerbose(t *testing.T) {
-	err := newBase("error")
+	err := errbase.New("error")
 	err = Stack(err)
 	var v Verboser
 	ok := As(err, &v)
@@ -60,7 +62,7 @@ func TestStackVerbose(t *testing.T) {
 }
 
 func TestStackFrames(t *testing.T) {
-	err := newBase("error")
+	err := errbase.New("error")
 	err = Stack(err)
 	var sErr *stack
 	ok := As(err, &sErr)
