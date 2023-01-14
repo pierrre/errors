@@ -19,7 +19,10 @@ func init() {
 }
 
 func Test(t *testing.T) {
-	err := errors.New("error")
+	err := errors.Join(
+		errors.New("error a"),
+		errors.New("error b"),
+	)
 	err = errors.Wrap(err, "test")
 	err = errignore.Wrap(err)
 	err = errtmp.Wrap(err, true)
@@ -45,22 +48,23 @@ func Test(t *testing.T) {
 
 func testError(t *testing.T, err error) {
 	t.Helper()
-	assert.ErrorEqual(t, err, "test: error")
+	assert.ErrorEqual(t, err, "test: error a\nerror b")
 }
 
 func testVerbose(t *testing.T, err error) {
 	t.Helper()
 	s := errverbose.String(err)
-	assert.RegexpMatch(t, `^test: error\nvalue c = d\ntag a = b\ntemporary = true\nignored\nstack\n(\t.+ .+:\d+\n)+\n$`, s)
+	assert.RegexpMatch(t, `^test: error a\nerror b\nvalue c = d\ntag a = b\ntemporary = true\nignored\n\nSub error 0: error a\nstack\n(\t.+ .+:\d+\n)+\n\nSub error 1: error b\nstack\n(\t.+ .+:\d+\n)+\n$`, s)
 }
 
 func testStack(t *testing.T, err error) {
 	t.Helper()
 	sfs := errstack.Frames(err)
-	assert.SliceLen(t, sfs, 1)
-	sf := sfs[0]
-	f, _ := sf.Next()
-	assert.Equal(t, f.Function, "github.com/pierrre/errors/integrationtest.Test")
+	assert.SliceLen(t, sfs, 2)
+	for _, sf := range sfs {
+		f, _ := sf.Next()
+		assert.Equal(t, f.Function, "github.com/pierrre/errors/integrationtest.Test")
+	}
 }
 
 func testIgnore(t *testing.T, err error) {
