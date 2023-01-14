@@ -3,10 +3,12 @@ package errors
 import (
 	"fmt"
 	"testing"
+
+	"github.com/pierrre/errors/errbase"
 )
 
 func TestWrap(t *testing.T) {
-	err := newBase("error")
+	err := errbase.New("error")
 	err = Wrap(err, "test")
 	s := err.Error()
 	expected := "test: error"
