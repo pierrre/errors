@@ -1,4 +1,4 @@
-package errors_test
+package errstack_test
 
 import (
 	"fmt"
@@ -7,13 +7,15 @@ import (
 
 	"github.com/pierrre/errors"
 	"github.com/pierrre/errors/errbase"
+	. "github.com/pierrre/errors/errstack"
 	"github.com/pierrre/errors/errverbose"
 )
 
-func TestStack(t *testing.T) {
+func Test(t *testing.T) {
 	err := errbase.New("error")
-	err = errors.Stack(err)
-	sfs := errors.StackFrames(err)
+	err = Ensure(err)
+	err = Ensure(err)
+	sfs := Frames(err)
 	if len(sfs) != 1 {
 		t.Fatalf("unexpected length: got %d, want %d", len(sfs), 1)
 	}
@@ -22,22 +24,22 @@ func TestStack(t *testing.T) {
 		t.Fatal("no stack frames")
 	}
 	f, _ := sf.Next()
-	expectedFunction := "github.com/pierrre/errors_test.TestStack"
+	expectedFunction := "github.com/pierrre/errors/errstack_test.Test"
 	if f.Function != expectedFunction {
 		t.Fatalf("unexpected function: got %q, want %q", f.Function, expectedFunction)
 	}
 }
 
-func TestStackNil(t *testing.T) {
-	err := errors.Stack(nil)
+func TestNil(t *testing.T) {
+	err := Wrap(nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 }
 
-func TestStackError(t *testing.T) {
+func TestError(t *testing.T) {
 	err := errbase.New("error")
-	err = errors.Stack(err)
+	err = Wrap(err)
 	s := err.Error()
 	expected := "error"
 	if s != expected {
@@ -45,9 +47,9 @@ func TestStackError(t *testing.T) {
 	}
 }
 
-func TestStackVerbose(t *testing.T) {
+func TestVerbose(t *testing.T) {
 	err := errbase.New("error")
-	err = errors.Stack(err)
+	err = Wrap(err)
 	var v errverbose.Interface
 	ok := errors.As(err, &v)
 	if !ok {
@@ -62,7 +64,7 @@ func TestStackVerbose(t *testing.T) {
 
 func TestStackFrames(t *testing.T) {
 	err := errbase.New("error")
-	err = errors.Stack(err)
+	err = Wrap(err)
 	var sErr interface {
 		StackFrames() []uintptr
 	}
@@ -76,11 +78,11 @@ func TestStackFrames(t *testing.T) {
 	}
 }
 
-func ExampleStack() {
+func Example() {
 	err := errors.New("error")
-	err = errors.Stack(err)
+	err = Wrap(err)
 	fmt.Println(err)
-	sfs := errors.StackFrames(err)
+	sfs := Frames(err)
 	fmt.Println(len(sfs))
 	// Output:
 	// error

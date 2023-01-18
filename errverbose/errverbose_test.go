@@ -1,4 +1,4 @@
-package errverbose
+package errverbose_test
 
 import (
 	"fmt"
@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/pierrre/errors/errbase"
+	. "github.com/pierrre/errors/errverbose"
 )
 
 func TestWrite(t *testing.T) {

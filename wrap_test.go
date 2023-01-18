@@ -1,10 +1,12 @@
-package errors
+package errors_test
 
 import (
 	"fmt"
 	"testing"
 
+	. "github.com/pierrre/errors"
 	"github.com/pierrre/errors/errbase"
+	"github.com/pierrre/errors/errstack"
 )
 
 func TestWrap(t *testing.T) {
@@ -15,14 +17,14 @@ func TestWrap(t *testing.T) {
 	if s != expected {
 		t.Fatalf("unexpected message: got %q, want %q", s, expected)
 	}
-	sfs := StackFrames(err)
+	sfs := errstack.Frames(err)
 	if len(sfs) != 1 {
 		t.Fatalf("unexpected length: got %d, want %d", len(sfs), 1)
 	}
 }
 
 func ExampleWrap() {
-	err := New("error")
+	err := errbase.New("error")
 	err = Wrap(err, "wrap")
 	fmt.Println(err)
 	// Output: wrap: error

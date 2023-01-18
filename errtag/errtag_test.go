@@ -1,15 +1,17 @@
-package errtag
+package errtag_test
 
 import (
 	"fmt"
 	"testing"
 
 	"github.com/pierrre/errors"
+	"github.com/pierrre/errors/errbase"
+	. "github.com/pierrre/errors/errtag"
 	"github.com/pierrre/errors/errverbose"
 )
 
 func Test(t *testing.T) {
-	err := errors.New("error")
+	err := errbase.New("error")
 	err = Wrap(err, "foo", "bar")
 	tags := Get(err)
 	if len(tags) != 1 {
@@ -21,7 +23,7 @@ func Test(t *testing.T) {
 }
 
 func Example() {
-	err := errors.New("error")
+	err := errbase.New("error")
 	err = Wrap(err, "foo", "bar")
 	tags := Get(err)
 	fmt.Println(tags["foo"])
@@ -29,7 +31,7 @@ func Example() {
 }
 
 func TestInt(t *testing.T) {
-	err := errors.New("error")
+	err := errbase.New("error")
 	err = WrapInt(err, "foo", 123)
 	tags := Get(err)
 	if len(tags) != 1 {
@@ -41,7 +43,7 @@ func TestInt(t *testing.T) {
 }
 
 func TestInt64(t *testing.T) {
-	err := errors.New("error")
+	err := errbase.New("error")
 	err = WrapInt64(err, "foo", 123)
 	tags := Get(err)
 	if len(tags) != 1 {
@@ -53,7 +55,7 @@ func TestInt64(t *testing.T) {
 }
 
 func TestFloat64(t *testing.T) {
-	err := errors.New("error")
+	err := errbase.New("error")
 	err = WrapFloat64(err, "foo", 12.3)
 	tags := Get(err)
 	if len(tags) != 1 {
@@ -65,7 +67,7 @@ func TestFloat64(t *testing.T) {
 }
 
 func TestBool(t *testing.T) {
-	err := errors.New("error")
+	err := errbase.New("error")
 	err = WrapBool(err, "foo", true)
 	tags := Get(err)
 	if len(tags) != 1 {
@@ -77,7 +79,7 @@ func TestBool(t *testing.T) {
 }
 
 func TestOverWrite(t *testing.T) {
-	err := errors.New("error")
+	err := errbase.New("error")
 	err = Wrap(err, "test", "1")
 	err = Wrap(err, "test", "2")
 	tags := Get(err)
@@ -97,7 +99,7 @@ func TestNil(t *testing.T) {
 }
 
 func TestEmpty(t *testing.T) {
-	err := errors.New("error")
+	err := errbase.New("error")
 	tags := Get(err)
 	if len(tags) != 0 {
 		t.Fatalf("tags not empty: got %#v", tags)
@@ -105,7 +107,7 @@ func TestEmpty(t *testing.T) {
 }
 
 func TestError(t *testing.T) {
-	err := errors.New("error")
+	err := errbase.New("error")
 	err = Wrap(err, "foo", "bar")
 	s := err.Error()
 	expected := "error"
@@ -115,7 +117,7 @@ func TestError(t *testing.T) {
 }
 
 func TestVerbose(t *testing.T) {
-	err := errors.New("error")
+	err := errbase.New("error")
 	err = Wrap(err, "foo", "bar")
 	var v errverbose.Interface
 	ok := errors.As(err, &v)

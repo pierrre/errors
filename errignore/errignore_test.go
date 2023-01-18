@@ -1,15 +1,17 @@
-package errignore
+package errignore_test
 
 import (
 	"fmt"
 	"testing"
 
 	"github.com/pierrre/errors"
+	"github.com/pierrre/errors/errbase"
+	. "github.com/pierrre/errors/errignore"
 	"github.com/pierrre/errors/errverbose"
 )
 
 func Test(t *testing.T) {
-	err := errors.New("error")
+	err := errbase.New("error")
 	err = Wrap(err)
 	ignored := Is(err)
 	if !ignored {
@@ -25,7 +27,7 @@ func TestNil(t *testing.T) {
 }
 
 func TestFalse(t *testing.T) {
-	err := errors.New("error")
+	err := errbase.New("error")
 	ignored := Is(err)
 	if ignored {
 		t.Fatalf("unexpected ignored: got %t, want %t", ignored, false)
@@ -33,7 +35,7 @@ func TestFalse(t *testing.T) {
 }
 
 func TestError(t *testing.T) {
-	err := errors.New("error")
+	err := errbase.New("error")
 	err = Wrap(err)
 	s := err.Error()
 	expected := "error"
@@ -43,7 +45,7 @@ func TestError(t *testing.T) {
 }
 
 func TestVerbose(t *testing.T) {
-	err := errors.New("error")
+	err := errbase.New("error")
 	err = Wrap(err)
 	var v errverbose.Interface
 	ok := errors.As(err, &v)
@@ -58,7 +60,7 @@ func TestVerbose(t *testing.T) {
 }
 
 func TestUnwrap(t *testing.T) {
-	err1 := errors.New("error")
+	err1 := errbase.New("error")
 	err2 := Wrap(err1)
 	err2 = errors.Unwrap(err2)
 	if err2 != err1 { //nolint:errorlint // We want to compare the error.
@@ -67,7 +69,7 @@ func TestUnwrap(t *testing.T) {
 }
 
 func Example() {
-	err := errors.New("error")
+	err := errbase.New("error")
 	err = Wrap(err)
 	ignored := Is(err)
 	fmt.Println(ignored)
