@@ -26,12 +26,6 @@ err := errors.New("error")
 err = errors.Wrap(err, "message")
 ```
 
-[`Message()`](https://pkg.go.dev/github.com/pierrre/errors#Message) adds a message to an error. Most applications should use [`Wrap()`](https://pkg.go.dev/github.com/pierrre/errors#Wrap) instead, because it automatically adds a stack.
-
-```go
-err = errors.WithMessage(err, "message")
-```
-
 ## Stack trace
 
 [`Stack()`](https://pkg.go.dev/github.com/pierrre/errors#Stack) adds a stack to an error. This is only useful if the wrapped error has a stack from a different goroutine. Most applications should use [`Wrap()`](https://pkg.go.dev/github.com/pierrre/errors#Wrap) instead.
@@ -81,6 +75,7 @@ Create a custom error type:
 See the provided packages as example:
 
 - [`errbase`](https://pkg.go.dev/github.com/pierrre/errors/errbase): create a base error (e.g. sentinel error)
+- [`errmsg`](https://pkg.go.dev/github.com/pierrre/errors/errmsg): add a message to an error
 - [`errtag`](https://pkg.go.dev/github.com/pierrre/errors/errtag): add a tag to an error
 - [`errval`](https://pkg.go.dev/github.com/pierrre/errors/errval): add a value to an error
 - [`errignore`](https://pkg.go.dev/github.com/pierrre/errors/errignore): mark an error as ignored

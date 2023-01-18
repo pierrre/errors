@@ -1,17 +1,18 @@
-package errors
+// Package errmsg provides a way to add messages to errors.
+package errmsg
 
 import (
 	"fmt"
 )
 
-// Message adds a message to an error.
+// Wrap adds a message to an error.
 //
 // The error message is "<msg>: <err>".
 //
 // If the given message is empty, the returned error is the given error.
 //
 // Use fmt.Sprintf() to format the message.
-func Message(err error, msg string) error {
+func Wrap(err error, msg string) error {
 	if err == nil {
 		return nil
 	}
