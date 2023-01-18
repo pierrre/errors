@@ -22,13 +22,13 @@ func TestWrite(t *testing.T) {
 	}
 }
 
-//nolint:testableexamples // The output contains a stack trace, which is not stable.
 func ExampleWrite() {
 	err := errbase.New("error")
 	buf := new(strings.Builder)
 	Write(buf, err)
 	s := buf.String()
 	fmt.Println(s)
+	// Output: error
 }
 
 func TestString(t *testing.T) {
@@ -43,11 +43,11 @@ func TestString(t *testing.T) {
 	}
 }
 
-//nolint:testableexamples // The output contains a stack trace, which is not stable.
 func ExampleString() {
 	err := errbase.New("error")
 	s := String(err)
 	fmt.Println(s)
+	// Output: error
 }
 
 func TestFormatter(t *testing.T) {
@@ -65,11 +65,11 @@ func TestFormatter(t *testing.T) {
 	}
 }
 
-//nolint:testableexamples // The output contains a stack trace, which is not stable.
 func ExampleFormatter() {
 	err := errbase.New("error")
 	f := Formatter(err)
 	fmt.Println(f)
+	// Output: error
 }
 
 type testVerbose struct {
