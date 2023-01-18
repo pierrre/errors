@@ -12,8 +12,7 @@ import (
 type Verboser interface {
 	// ErrorVerbose writes the verbose message of the error to the writer.
 	// It must only write the verbose message of the error, not the error chain.
-	// It is responsible for writing a new line character at the end.
-	ErrorVerbose(io.Writer)
+	ErrorVerbose() string
 }
 
 // Verbose writes the error's verbose message to the writer.
@@ -26,7 +25,9 @@ func Verbose(w io.Writer, err error) {
 	for ; err != nil; err = Unwrap(err) {
 		v, ok := err.(Verboser) //nolint:errorlint // We want to compare the current error.
 		if ok {
-			v.ErrorVerbose(w)
+			s := v.ErrorVerbose()
+			_, _ = io.WriteString(w, s)
+			_, _ = io.WriteString(w, "\n")
 		}
 	}
 }

@@ -3,7 +3,6 @@ package errtag
 
 import (
 	"fmt"
-	"io"
 	"strconv"
 
 	"github.com/pierrre/errors"
@@ -55,8 +54,8 @@ func (err *tag) Unwrap() error {
 	return err.error
 }
 
-func (err *tag) ErrorVerbose(w io.Writer) {
-	_, _ = fmt.Fprintf(w, "tag %s = %s\n", err.key, err.val)
+func (err *tag) ErrorVerbose() string {
+	return fmt.Sprintf("tag %s = %s", err.key, err.val)
 }
 
 func (err *tag) Tag() (key string, val string) {

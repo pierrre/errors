@@ -1,7 +1,6 @@
 package errors
 
 import (
-	"bytes"
 	"fmt"
 	"regexp"
 	"testing"
@@ -52,9 +51,7 @@ func TestStackVerbose(t *testing.T) {
 	if !ok {
 		t.Fatal("not a Verbose")
 	}
-	buf := new(bytes.Buffer)
-	v.ErrorVerbose(buf)
-	s := buf.String()
+	s := v.ErrorVerbose()
 	expectedRegexp := regexp.MustCompile(`^stack\n(\t.+ .+:\d+\n)+$`)
 	if !expectedRegexp.MatchString(s) {
 		t.Fatalf("unexpected verbose message:\ngot: %q\nwant match: %q", s, expectedRegexp)

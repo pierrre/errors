@@ -1,7 +1,6 @@
 package errtag
 
 import (
-	"bytes"
 	"fmt"
 	"testing"
 
@@ -122,10 +121,8 @@ func TestVerbose(t *testing.T) {
 	if !ok {
 		t.Fatal("not a Verbose")
 	}
-	buf := new(bytes.Buffer)
-	v.ErrorVerbose(buf)
-	s := buf.String()
-	expected := "tag foo = bar\n"
+	s := v.ErrorVerbose()
+	expected := "tag foo = bar"
 	if s != expected {
 		t.Fatalf("unexpected message: got %q, want %q", s, expected)
 	}

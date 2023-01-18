@@ -1,7 +1,6 @@
 package errtmp
 
 import (
-	"bytes"
 	"fmt"
 	"testing"
 
@@ -59,10 +58,8 @@ func TestVerbose(t *testing.T) {
 	if !ok {
 		t.Fatal("not a Verbose")
 	}
-	buf := new(bytes.Buffer)
-	v.ErrorVerbose(buf)
-	s := buf.String()
-	expected := "temporary = true\n"
+	s := v.ErrorVerbose()
+	expected := "temporary = true"
 	if s != expected {
 		t.Fatalf("unexpected message: got %q, want %q", s, expected)
 	}
