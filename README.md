@@ -80,6 +80,7 @@ Create a custom error type:
 
 See the provided packages as example:
 
+- [`errbase`](https://pkg.go.dev/github.com/pierrre/errors/errbase): create a base error (e.g. sentinel error)
 - [`errtag`](https://pkg.go.dev/github.com/pierrre/errors/errtag): add a tag to an error
 - [`errval`](https://pkg.go.dev/github.com/pierrre/errors/errval): add a value to an error
 - [`errignore`](https://pkg.go.dev/github.com/pierrre/errors/errignore): mark an error as ignored
