@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/pierrre/errors"
+	"github.com/pierrre/errors/errverbose"
 )
 
 func TestTrue(t *testing.T) {
@@ -53,7 +54,7 @@ func TestError(t *testing.T) {
 func TestVerbose(t *testing.T) {
 	err := errors.New("error")
 	err = Wrap(err, true)
-	var v errors.Verboser
+	var v errverbose.Interface
 	ok := errors.As(err, &v)
 	if !ok {
 		t.Fatal("not a Verbose")

@@ -45,7 +45,7 @@ frames := errors.StackFrames(err)
 The error verbose message shows additional information about the error.
 Wrapping functions may provide a verbose message (stack, tag, value, etc.)
 
-The [`Verbose()`](https://pkg.go.dev/github.com/pierrre/errors#Verbose)/[`VerboseString()`](https://pkg.go.dev/github.com/pierrre/errors#VerboseString)/[`VerboseFormatter()`](https://pkg.go.dev/github.com/pierrre/errors#VerboseFormatter) write/return/format the error verbose message.
+The [`errverbose`](https://pkg.go.dev/github.com/pierrre/errors/errverbose) package provides utilities to manage error verbose messages. The [`Write()`](https://pkg.go.dev/github.com/pierrre/errors/errverbose#Write)/[`String()`](https://pkg.go.dev/github.com/pierrre/errors/errverbose#String)/[`Formatter()`](https://pkg.go.dev/github.com/pierrre/errors/errverbose#Formatter) functions write/return/format the error verbose message.
 
 The first line is the error's message.
 The following lines are the verbose message of the error chain.
@@ -70,7 +70,7 @@ Create a custom error type:
 
 - Create a type implementing the [`error`](https://pkg.go.dev/builtin#error) interface
 - Optionally implement the [`Unwrap() error`](https://pkg.go.dev/errors#Unwrap) method
-- Optionally implement the [`Verboser`](https://pkg.go.dev/github.com/pierrre/errors#Verboser) interface
+- Optionally implement the [`errverbose.Interface`](https://pkg.go.dev/github.com/pierrre/errors/errverbose#Interface) interface
 
 See the provided packages as example:
 

@@ -1,4 +1,4 @@
-package errors
+package errverbose
 
 import (
 	"fmt"
@@ -8,13 +8,13 @@ import (
 	"github.com/pierrre/errors/errbase"
 )
 
-func TestVerbose(t *testing.T) {
+func TestWrite(t *testing.T) {
 	err := errbase.New("error")
 	err = &testVerbose{
 		error: err,
 	}
 	buf := new(strings.Builder)
-	Verbose(buf, err)
+	Write(buf, err)
 	s := buf.String()
 	expected := "error\nverbose\n"
 	if s != expected {
@@ -23,20 +23,20 @@ func TestVerbose(t *testing.T) {
 }
 
 //nolint:testableexamples // The output contains a stack trace, which is not stable.
-func ExampleVerbose() {
-	err := New("error")
+func ExampleWrite() {
+	err := errbase.New("error")
 	buf := new(strings.Builder)
-	Verbose(buf, err)
+	Write(buf, err)
 	s := buf.String()
 	fmt.Println(s)
 }
 
-func TestVerboseString(t *testing.T) {
+func TestString(t *testing.T) {
 	err := errbase.New("error")
 	err = &testVerbose{
 		error: err,
 	}
-	s := VerboseString(err)
+	s := String(err)
 	expected := "error\nverbose\n"
 	if s != expected {
 		t.Fatalf("unexpected verbose message:\ngot: %q\nwant: %q", s, expected)
@@ -44,18 +44,18 @@ func TestVerboseString(t *testing.T) {
 }
 
 //nolint:testableexamples // The output contains a stack trace, which is not stable.
-func ExampleVerboseString() {
-	err := New("error")
-	s := VerboseString(err)
+func ExampleString() {
+	err := errbase.New("error")
+	s := String(err)
 	fmt.Println(s)
 }
 
-func TestVerboseFormatter(t *testing.T) {
+func TestFormatter(t *testing.T) {
 	err := errbase.New("error")
 	err = &testVerbose{
 		error: err,
 	}
-	f := VerboseFormatter(err)
+	f := Formatter(err)
 	buf := new(strings.Builder)
 	_, _ = fmt.Fprintf(buf, "%v", f)
 	s := buf.String()
@@ -66,9 +66,9 @@ func TestVerboseFormatter(t *testing.T) {
 }
 
 //nolint:testableexamples // The output contains a stack trace, which is not stable.
-func ExampleVerboseFormatter() {
-	err := New("error")
-	f := VerboseFormatter(err)
+func ExampleFormatter() {
+	err := errbase.New("error")
+	f := Formatter(err)
 	fmt.Println(f)
 }
 
