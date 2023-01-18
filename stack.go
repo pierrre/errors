@@ -2,9 +2,9 @@ package errors
 
 import (
 	"fmt"
-	"io"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"sync"
 )
 
@@ -36,24 +36,17 @@ func (err *stack) Unwrap() error {
 	return err.error
 }
 
-// StackFrameVerboseWriter writes a runtime.Frame to an error verbose message.
-//
-// It must write a new line character at the end.
-//
-// It can be changed in order to customize how runtime.Frame are formatted.
-var StackFrameVerboseWriter = func(w io.Writer, f runtime.Frame) {
-	_, file := filepath.Split(f.File)
-	_, _ = fmt.Fprintf(w, "\t%s %s:%d\n", f.Function, file, f.Line)
-}
-
-func (err *stack) ErrorVerbose(w io.Writer) {
-	_, _ = io.WriteString(w, "stack\n")
+func (err *stack) ErrorVerbose() string {
+	b := new(strings.Builder) // TODO use a buffer pool.
+	_, _ = b.WriteString("stack\n")
 	fs := err.RuntimeStackFrames()
 	for more := true; more; {
 		var f runtime.Frame
 		f, more = fs.Next()
-		StackFrameVerboseWriter(w, f)
+		_, file := filepath.Split(f.File)
+		_, _ = fmt.Fprintf(b, "\t%s %s:%d\n", f.Function, file, f.Line)
 	}
+	return b.String()
 }
 
 // StackFrames returns the list of PCs associated to the error.

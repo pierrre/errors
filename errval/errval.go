@@ -3,19 +3,15 @@ package errval
 
 import (
 	"fmt"
-	"io"
 
 	"github.com/pierrre/errors"
 )
 
-// VerboseWriter writes a value to an error verbose message.
-//
-// It must write a new line character at the end.
+// VerboseStringer returns the string representation of a value in a verbose message.
 //
 // It can be changed in order to customize how values are formatted.
-var VerboseWriter = func(w io.Writer, v any) {
-	_, _ = fmt.Fprint(w, v)
-	_, _ = io.WriteString(w, "\n")
+var VerboseStringer = func(v any) string {
+	return fmt.Sprint(v)
 }
 
 // Wrap adds a value to an error.
@@ -43,9 +39,8 @@ func (err *value) Unwrap() error {
 	return err.error
 }
 
-func (err *value) ErrorVerbose(w io.Writer) {
-	_, _ = fmt.Fprintf(w, "value %s = ", err.key)
-	VerboseWriter(w, err.val)
+func (err *value) ErrorVerbose() string {
+	return fmt.Sprintf("value %s = %s", err.key, VerboseStringer(err.val))
 }
 
 func (err *value) Value() (key string, val any) {

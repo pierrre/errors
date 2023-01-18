@@ -3,7 +3,6 @@ package errtmp
 
 import (
 	"fmt"
-	"io"
 
 	"github.com/pierrre/errors"
 )
@@ -30,8 +29,8 @@ func (err *temporary) Unwrap() error {
 	return err.error
 }
 
-func (err *temporary) ErrorVerbose(w io.Writer) {
-	_, _ = fmt.Fprintf(w, "temporary = %t\n", err.tmp)
+func (err *temporary) ErrorVerbose() string {
+	return fmt.Sprintf("temporary = %t", err.tmp)
 }
 
 func (err *temporary) Temporary() bool {

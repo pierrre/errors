@@ -2,7 +2,6 @@ package errors
 
 import (
 	"fmt"
-	"io"
 	"strings"
 	"testing"
 
@@ -77,6 +76,6 @@ type testVerbose struct {
 	error
 }
 
-func (v *testVerbose) ErrorVerbose(w io.Writer) {
-	_, _ = io.WriteString(w, "verbose\n")
+func (v *testVerbose) ErrorVerbose() string {
+	return "verbose"
 }
