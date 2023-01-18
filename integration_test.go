@@ -9,6 +9,7 @@ import (
 	"github.com/pierrre/errors/errtag"
 	"github.com/pierrre/errors/errtmp"
 	"github.com/pierrre/errors/errval"
+	"github.com/pierrre/errors/errverbose"
 )
 
 func TestIntegration(t *testing.T) {
@@ -26,7 +27,7 @@ func TestIntegration(t *testing.T) {
 		}
 	})
 	t.Run("Verbose", func(t *testing.T) {
-		s := errors.VerboseString(err)
+		s := errverbose.String(err)
 		expected := regexp.MustCompile(`^test: error\nvalue c = d\ntag a = b\ntemporary = true\nignored\nstack\n(\t.+ .+:\d+\n)+\n$`)
 		if !expected.MatchString(s) {
 			t.Fatalf("unexpected verbose message:\ngot: %q\nwant match: %q", s, expected)
