@@ -1,7 +1,9 @@
-package errbase
+package errbase_test
 
 import (
 	"testing"
+
+	. "github.com/pierrre/errors/errbase"
 )
 
 func Test(t *testing.T) {

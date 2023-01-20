@@ -1,6 +1,8 @@
-package errors
+// Package errstack provides utilities to manage error stack traces.
+package errstack
 
 import (
+	"errors"
 	"fmt"
 	"path/filepath"
 	"runtime"
@@ -8,16 +10,19 @@ import (
 	"sync"
 )
 
-// Stack adds a stack to an error.
+// Wrap adds a stack to an error.
 //
 // The verbose message contains the stack.
 //
 // See https://pkg.go.dev/runtime#Frames .
-func Stack(err error) error {
-	return stackSkip(err, 2)
+func Wrap(err error) error {
+	return WrapSkip(err, 1)
 }
 
-func stackSkip(err error, skip int) error {
+// WrapSkip adds a stack to an error, skipping the given number of frames.
+//
+// See Wrap().
+func WrapSkip(err error, skip int) error {
 	if err == nil {
 		return nil
 	}
@@ -25,6 +30,19 @@ func stackSkip(err error, skip int) error {
 		error:   err,
 		callers: callers(skip + 1),
 	}
+}
+
+// Ensure adds a stack to an error if it does not already have one.
+func Ensure(err error) error {
+	return EnsureSkip(err, 1)
+}
+
+// EnsureSkip adds a stack to an error if it does not already have one, skipping the given number of frames.
+func EnsureSkip(err error, skip int) error {
+	if !has(err) {
+		err = WrapSkip(err, skip+1)
+	}
+	return err
 }
 
 type stack struct {
@@ -67,12 +85,12 @@ func (err *stack) RuntimeStackFrames() *runtime.Frames {
 	return runtime.CallersFrames(err.callers)
 }
 
-// StackFrames returns the list of runtime.Frames associated to an error.
+// Frames returns the list of runtime.Frames associated to an error.
 //
 // See https://pkg.go.dev/runtime#Frames .
-func StackFrames(err error) []*runtime.Frames {
+func Frames(err error) []*runtime.Frames {
 	var fss []*runtime.Frames
-	for ; err != nil; err = Unwrap(err) {
+	for ; err != nil; err = errors.Unwrap(err) {
 		err, ok := err.(interface { //nolint:errorlint // We want to compare the current error.
 			RuntimeStackFrames() *runtime.Frames
 		})
@@ -84,18 +102,11 @@ func StackFrames(err error) []*runtime.Frames {
 	return fss
 }
 
-func ensureStack(err error, skip int) error {
-	if !hasStack(err) {
-		err = stackSkip(err, skip+1)
-	}
-	return err
-}
-
-func hasStack(err error) bool {
+func has(err error) bool {
 	var werr interface {
 		RuntimeStackFrames() *runtime.Frames
 	}
-	return As(err, &werr)
+	return errors.As(err, &werr)
 }
 
 const callersMaxLength = 1 << 16
@@ -110,7 +121,7 @@ func callers(skip int) []uintptr {
 	pcItf := callersPool.Get()
 	defer callersPool.Put(pcItf)
 	pc := pcItf.([]uintptr) //nolint:forcetypeassert // The pool always contains []uintptr.
-	n := runtime.Callers(skip+1, pc)
+	n := runtime.Callers(skip+2, pc)
 	pcRes := make([]uintptr, n)
 	copy(pcRes, pc)
 	return pcRes

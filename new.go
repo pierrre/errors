@@ -2,17 +2,14 @@ package errors
 
 import (
 	"github.com/pierrre/errors/errbase"
+	"github.com/pierrre/errors/errstack"
 )
 
 // New returns a new error with a message and a stack.
 //
 // Use fmt.Sprintf() to format the message.
 func New(msg string) error {
-	return newError(msg)
-}
-
-func newError(msg string) error {
 	err := errbase.New(msg)
-	err = stackSkip(err, 3)
-	return err
+	err = errstack.WrapSkip(err, 1)
+	return err //nolint: wrapcheck // The error is wrapped.
 }

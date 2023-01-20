@@ -1,15 +1,17 @@
-package errval
+package errval_test
 
 import (
 	"fmt"
 	"testing"
 
 	"github.com/pierrre/errors"
+	"github.com/pierrre/errors/errbase"
+	. "github.com/pierrre/errors/errval"
 	"github.com/pierrre/errors/errverbose"
 )
 
 func Test(t *testing.T) {
-	err := errors.New("error")
+	err := errbase.New("error")
 	err = Wrap(err, "foo", "bar")
 	vals := Get(err)
 	if len(vals) != 1 {
@@ -21,7 +23,7 @@ func Test(t *testing.T) {
 }
 
 func TestOverWrite(t *testing.T) {
-	err := errors.New("error")
+	err := errbase.New("error")
 	err = Wrap(err, "test", 1)
 	err = Wrap(err, "test", 2)
 	vals := Get(err)
@@ -41,7 +43,7 @@ func TestNil(t *testing.T) {
 }
 
 func TestEmpty(t *testing.T) {
-	err := errors.New("error")
+	err := errbase.New("error")
 	vals := Get(err)
 	if len(vals) != 0 {
 		t.Fatalf("values not empty: got %#v", vals)
@@ -49,7 +51,7 @@ func TestEmpty(t *testing.T) {
 }
 
 func TestError(t *testing.T) {
-	err := errors.New("error")
+	err := errbase.New("error")
 	err = Wrap(err, "foo", "bar")
 	s := err.Error()
 	expected := "error"
@@ -59,7 +61,7 @@ func TestError(t *testing.T) {
 }
 
 func TestVerbose(t *testing.T) {
-	err := errors.New("error")
+	err := errbase.New("error")
 	err = Wrap(err, "foo", "bar")
 	var v errverbose.Interface
 	ok := errors.As(err, &v)
@@ -74,7 +76,7 @@ func TestVerbose(t *testing.T) {
 }
 
 func Example() {
-	err := errors.New("error")
+	err := errbase.New("error")
 	err = Wrap(err, "foo", "bar")
 	vals := Get(err)
 	fmt.Println(vals["foo"])
