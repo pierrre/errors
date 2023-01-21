@@ -24,6 +24,19 @@ func TestNew(t *testing.T) {
 	}
 }
 
+func TestNewf(t *testing.T) {
+	err := Newf("error %d", 1)
+	s := err.Error()
+	expected := "error 1"
+	if s != expected {
+		t.Fatalf("unexpected message: got %q, want %q", s, expected)
+	}
+	sfs := errstack.Frames(err)
+	if len(sfs) != 1 {
+		t.Fatalf("unexpected length: got %d, want %d", len(sfs), 1)
+	}
+}
+
 func ExampleNew() {
 	err := errors.New("error")
 	fmt.Println(err)
@@ -35,6 +48,20 @@ func TestWrap(t *testing.T) {
 	err = Wrap(err, "test")
 	s := err.Error()
 	expected := "test: error"
+	if s != expected {
+		t.Fatalf("unexpected message: got %q, want %q", s, expected)
+	}
+	sfs := errstack.Frames(err)
+	if len(sfs) != 1 {
+		t.Fatalf("unexpected length: got %d, want %d", len(sfs), 1)
+	}
+}
+
+func TestWrapf(t *testing.T) {
+	err := errbase.New("error")
+	err = Wrapf(err, "test %d", 1)
+	s := err.Error()
+	expected := "test 1: error"
 	if s != expected {
 		t.Fatalf("unexpected message: got %q, want %q", s, expected)
 	}

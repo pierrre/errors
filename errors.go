@@ -12,20 +12,30 @@ import (
 )
 
 // New returns a new error with a message and a stack.
-//
-// Use fmt.Sprintf() to format the message.
 func New(msg string) error {
 	err := errbase.New(msg)
 	err = errstack.WrapSkip(err, 1)
 	return err //nolint: wrapcheck // The error is wrapped.
 }
 
+// Newf returns a new error with a formatted message and a stack.
+func Newf(format string, args ...any) error {
+	err := errbase.Newf(format, args...)
+	err = errstack.WrapSkip(err, 1)
+	return err //nolint: wrapcheck // The error is wrapped.
+}
+
 // Wrap adds a message to an error, and optionnally add a stack if it doesn't have one.
-//
-// See Message() and Stack() for more information.
 func Wrap(err error, msg string) error {
 	err = errstack.EnsureSkip(err, 1)
 	err = errmsg.Wrap(err, msg)
+	return err
+}
+
+// Wrapf adds a formatted message to an error, and optionnally add a stack if it doesn't have one.
+func Wrapf(err error, format string, args ...any) error {
+	err = errstack.EnsureSkip(err, 1)
+	err = errmsg.Wrapf(err, format, args...)
 	return err
 }
 

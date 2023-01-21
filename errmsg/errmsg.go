@@ -10,8 +10,6 @@ import (
 // The error message is "<msg>: <err>".
 //
 // If the given message is empty, the returned error is the given error.
-//
-// Use fmt.Sprintf() to format the message.
 func Wrap(err error, msg string) error {
 	if err == nil {
 		return nil
@@ -23,6 +21,13 @@ func Wrap(err error, msg string) error {
 		error: err,
 		msg:   msg,
 	}
+}
+
+// Wrapf adds a formatted message to an error.
+//
+// See Wrap.
+func Wrapf(err error, format string, args ...interface{}) error {
+	return Wrap(err, fmt.Sprintf(format, args...))
 }
 
 type message struct {
