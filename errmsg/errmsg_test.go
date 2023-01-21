@@ -11,9 +11,9 @@ import (
 
 func Test(t *testing.T) {
 	err := errbase.New("error")
-	err = Wrap(err, "test")
+	err = Wrapf(err, "test %d", 1)
 	s := err.Error()
-	expected := "test: error"
+	expected := "test 1: error"
 	if s != expected {
 		t.Fatalf("unexpected message: got %q, want %q", s, expected)
 	}

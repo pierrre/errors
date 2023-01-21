@@ -7,9 +7,9 @@ import (
 )
 
 func Test(t *testing.T) {
-	err := New("error")
+	err := Newf("error %d", 1)
 	s := err.Error()
-	expected := "error"
+	expected := "error 1"
 	if s != expected {
 		t.Fatalf("unexpected message: got %q, want %q", s, expected)
 	}
