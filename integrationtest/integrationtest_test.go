@@ -1,4 +1,4 @@
-package integration_test
+package integrationtest
 
 import (
 	"regexp"
@@ -64,7 +64,7 @@ func testStack(t *testing.T, err error) {
 	}
 	sf := sfs[0]
 	f, _ := sf.Next()
-	expectedFunction := "github.com/pierrre/errors/integration_test_test.Test"
+	expectedFunction := "github.com/pierrre/errors/integrationtest.Test"
 	if f.Function != expectedFunction {
 		t.Fatalf("unexpected function: got %q, want %q", f.Function, expectedFunction)
 	}
