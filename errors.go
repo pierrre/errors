@@ -25,14 +25,14 @@ func Newf(format string, args ...any) error {
 	return err //nolint: wrapcheck // The error is wrapped.
 }
 
-// Wrap adds a message to an error, and optionnally add a stack if it doesn't have one.
+// Wrap adds a message to an error, and a stack if it doesn't have one.
 func Wrap(err error, msg string) error {
 	err = errstack.EnsureSkip(err, 1)
 	err = errmsg.Wrap(err, msg)
 	return err
 }
 
-// Wrapf adds a formatted message to an error, and optionnally add a stack if it doesn't have one.
+// Wrapf adds a formatted message to an error, and a stack if it doesn't have one.
 func Wrapf(err error, format string, args ...any) error {
 	err = errstack.EnsureSkip(err, 1)
 	err = errmsg.Wrapf(err, format, args...)
