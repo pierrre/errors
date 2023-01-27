@@ -1,7 +1,6 @@
 package errors_test
 
 import (
-	"errors"
 	"fmt"
 	"io/fs"
 	"testing"
@@ -38,7 +37,7 @@ func TestNewf(t *testing.T) {
 }
 
 func ExampleNew() {
-	err := errors.New("error")
+	err := New("error")
 	fmt.Println(err)
 	// Output: error
 }

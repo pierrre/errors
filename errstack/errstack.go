@@ -2,7 +2,7 @@
 package errstack
 
 import (
-	"errors"
+	std_errors "errors" // Prevent import cycle.
 	"fmt"
 	"path/filepath"
 	"runtime"
@@ -90,7 +90,7 @@ func (err *stack) RuntimeStackFrames() *runtime.Frames {
 // See https://pkg.go.dev/runtime#Frames .
 func Frames(err error) []*runtime.Frames {
 	var fss []*runtime.Frames
-	for ; err != nil; err = errors.Unwrap(err) {
+	for ; err != nil; err = std_errors.Unwrap(err) {
 		err, ok := err.(interface { //nolint:errorlint // We want to compare the current error.
 			RuntimeStackFrames() *runtime.Frames
 		})
@@ -106,7 +106,7 @@ func has(err error) bool {
 	var werr interface {
 		RuntimeStackFrames() *runtime.Frames
 	}
-	return errors.As(err, &werr)
+	return std_errors.As(err, &werr)
 }
 
 const callersMaxLength = 1 << 16
