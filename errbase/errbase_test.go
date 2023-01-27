@@ -4,16 +4,18 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/pierrre/assert"
 	. "github.com/pierrre/errors/errbase"
+	"github.com/pierrre/errors/internal/errtest"
 )
+
+func init() {
+	errtest.Configure()
+}
 
 func Test(t *testing.T) {
 	err := Newf("error %d", 1)
-	s := err.Error()
-	expected := "error 1"
-	if s != expected {
-		t.Fatalf("unexpected message: got %q, want %q", s, expected)
-	}
+	assert.ErrorEqual(t, err, "error 1")
 }
 
 func Example() {

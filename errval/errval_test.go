@@ -4,22 +4,25 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/pierrre/errors"
+	"github.com/pierrre/assert"
 	"github.com/pierrre/errors/errbase"
 	. "github.com/pierrre/errors/errval"
 	"github.com/pierrre/errors/errverbose"
+	"github.com/pierrre/errors/internal/errtest"
 )
+
+func init() {
+	errtest.Configure()
+}
 
 func Test(t *testing.T) {
 	err := errbase.New("error")
 	err = Wrap(err, "foo", "bar")
 	vals := Get(err)
-	if len(vals) != 1 {
-		t.Fatalf("unexpected length: got %d, want %d", len(vals), 1)
-	}
-	if vals["foo"] != "bar" {
-		t.Fatalf("unexpected value: got %q, want %q", vals["foo"], "bar")
-	}
+	// TODO: use assert.MapEqual with Go 1.20.
+	assert.DeepEqual(t, vals, map[string]interface{}{
+		"foo": "bar",
+	})
 }
 
 func TestOverWrite(t *testing.T) {
@@ -27,52 +30,36 @@ func TestOverWrite(t *testing.T) {
 	err = Wrap(err, "test", 1)
 	err = Wrap(err, "test", 2)
 	vals := Get(err)
-	if len(vals) != 1 {
-		t.Fatalf("unexpected length: got %d, want %d", len(vals), 1)
-	}
-	if vals["test"] != 2 {
-		t.Fatalf("unexpected value: got %v, want %d", vals["test"], 1)
-	}
+	// TODO: use assert.MapEqual with Go 1.20.
+	assert.DeepEqual(t, vals, map[string]interface{}{
+		"test": 2,
+	})
 }
 
 func TestNil(t *testing.T) {
 	err := Wrap(nil, "foo", "bar")
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.NoError(t, err)
 }
 
 func TestEmpty(t *testing.T) {
 	err := errbase.New("error")
 	vals := Get(err)
-	if len(vals) != 0 {
-		t.Fatalf("values not empty: got %#v", vals)
-	}
+	assert.MapEmpty(t, vals)
 }
 
 func TestError(t *testing.T) {
 	err := errbase.New("error")
 	err = Wrap(err, "foo", "bar")
-	s := err.Error()
-	expected := "error"
-	if s != expected {
-		t.Fatalf("unexpected message: got %q, want %q", s, expected)
-	}
+	assert.ErrorEqual(t, err, "error")
 }
 
 func TestVerbose(t *testing.T) {
 	err := errbase.New("error")
 	err = Wrap(err, "foo", "bar")
 	var v errverbose.Interface
-	ok := errors.As(err, &v)
-	if !ok {
-		t.Fatal("not a Verbose")
-	}
+	assert.ErrorAs(t, err, &v)
 	s := v.ErrorVerbose()
-	expected := "value foo = bar"
-	if s != expected {
-		t.Fatalf("unexpected message: got %q, want %q", s, expected)
-	}
+	assert.Equal(t, s, "value foo = bar")
 }
 
 func Example() {
