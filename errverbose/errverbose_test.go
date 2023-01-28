@@ -5,9 +5,15 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/pierrre/assert"
 	"github.com/pierrre/errors/errbase"
 	. "github.com/pierrre/errors/errverbose"
+	"github.com/pierrre/errors/internal/errtest"
 )
+
+func init() {
+	errtest.Configure()
+}
 
 func TestWrite(t *testing.T) {
 	err := errbase.New("error")
@@ -17,10 +23,7 @@ func TestWrite(t *testing.T) {
 	buf := new(strings.Builder)
 	Write(buf, err)
 	s := buf.String()
-	expected := "error\nverbose\n"
-	if s != expected {
-		t.Fatalf("unexpected verbose message:\ngot: %q\nwant: %q", s, expected)
-	}
+	assert.Equal(t, s, "error\nverbose\n")
 }
 
 func ExampleWrite() {
@@ -38,10 +41,7 @@ func TestString(t *testing.T) {
 		error: err,
 	}
 	s := String(err)
-	expected := "error\nverbose\n"
-	if s != expected {
-		t.Fatalf("unexpected verbose message:\ngot: %q\nwant: %q", s, expected)
-	}
+	assert.Equal(t, s, "error\nverbose\n")
 }
 
 func ExampleString() {
@@ -60,10 +60,7 @@ func TestFormatter(t *testing.T) {
 	buf := new(strings.Builder)
 	_, _ = fmt.Fprintf(buf, "%v", f)
 	s := buf.String()
-	expected := "error\nverbose\n"
-	if s != expected {
-		t.Fatalf("unexpected verbose message:\ngot: %q\nwant: %q", s, expected)
-	}
+	assert.Equal(t, s, "error\nverbose\n")
 }
 
 func ExampleFormatter() {

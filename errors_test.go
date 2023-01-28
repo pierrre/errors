@@ -5,35 +5,29 @@ import (
 	"io/fs"
 	"testing"
 
+	"github.com/pierrre/assert"
 	. "github.com/pierrre/errors"
 	"github.com/pierrre/errors/errbase"
 	"github.com/pierrre/errors/errstack"
+	"github.com/pierrre/errors/internal/errtest"
 )
+
+func init() {
+	errtest.Configure()
+}
 
 func TestNew(t *testing.T) {
 	err := New("error")
-	s := err.Error()
-	expected := "error"
-	if s != expected {
-		t.Fatalf("unexpected message: got %q, want %q", s, expected)
-	}
+	assert.ErrorEqual(t, err, "error")
 	sfs := errstack.Frames(err)
-	if len(sfs) != 1 {
-		t.Fatalf("unexpected length: got %d, want %d", len(sfs), 1)
-	}
+	assert.SliceLen(t, sfs, 1)
 }
 
 func TestNewf(t *testing.T) {
 	err := Newf("error %d", 1)
-	s := err.Error()
-	expected := "error 1"
-	if s != expected {
-		t.Fatalf("unexpected message: got %q, want %q", s, expected)
-	}
+	assert.ErrorEqual(t, err, "error 1")
 	sfs := errstack.Frames(err)
-	if len(sfs) != 1 {
-		t.Fatalf("unexpected length: got %d, want %d", len(sfs), 1)
-	}
+	assert.SliceLen(t, sfs, 1)
 }
 
 func ExampleNew() {
@@ -45,29 +39,17 @@ func ExampleNew() {
 func TestWrap(t *testing.T) {
 	err := errbase.New("error")
 	err = Wrap(err, "test")
-	s := err.Error()
-	expected := "test: error"
-	if s != expected {
-		t.Fatalf("unexpected message: got %q, want %q", s, expected)
-	}
+	assert.ErrorEqual(t, err, "test: error")
 	sfs := errstack.Frames(err)
-	if len(sfs) != 1 {
-		t.Fatalf("unexpected length: got %d, want %d", len(sfs), 1)
-	}
+	assert.SliceLen(t, sfs, 1)
 }
 
 func TestWrapf(t *testing.T) {
 	err := errbase.New("error")
 	err = Wrapf(err, "test %d", 1)
-	s := err.Error()
-	expected := "test 1: error"
-	if s != expected {
-		t.Fatalf("unexpected message: got %q, want %q", s, expected)
-	}
+	assert.ErrorEqual(t, err, "test 1: error")
 	sfs := errstack.Frames(err)
-	if len(sfs) != 1 {
-		t.Fatalf("unexpected length: got %d, want %d", len(sfs), 1)
-	}
+	assert.SliceLen(t, sfs, 1)
 }
 
 func ExampleWrap() {
@@ -82,19 +64,13 @@ func TestAs(t *testing.T) {
 	err = &fs.PathError{Err: err}
 	err = Wrap(err, "test")
 	var pathError *fs.PathError
-	ok := As(err, &pathError)
-	if !ok {
-		t.Fatal("not ok")
-	}
+	assert.ErrorAs(t, err, &pathError)
 }
 
 func TestIs(t *testing.T) {
 	errBase := errbase.New("error")
 	err := Wrap(errBase, "test")
-	ok := Is(err, errBase)
-	if !ok {
-		t.Fatal("not ok")
-	}
+	assert.ErrorIs(t, err, errBase)
 }
 
 func TestUnwrap(t *testing.T) {
@@ -102,7 +78,8 @@ func TestUnwrap(t *testing.T) {
 	err := Wrap(errBase, "test")
 	err = Unwrap(err)
 	err = Unwrap(err)
+	// TODO: use assert.Equal with Go 1.20.
 	if err != errBase { //nolint:errorlint // We want to compare this error.
-		t.Fatal("not equal")
+		t.Fatal("error not equal")
 	}
 }

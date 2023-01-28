@@ -1,9 +1,9 @@
 package integrationtest
 
 import (
-	"regexp"
 	"testing"
 
+	"github.com/pierrre/assert"
 	"github.com/pierrre/errors"
 	"github.com/pierrre/errors/errignore"
 	"github.com/pierrre/errors/errstack"
@@ -11,7 +11,12 @@ import (
 	"github.com/pierrre/errors/errtmp"
 	"github.com/pierrre/errors/errval"
 	"github.com/pierrre/errors/errverbose"
+	"github.com/pierrre/errors/internal/errtest"
 )
+
+func init() {
+	errtest.Configure()
+}
 
 func Test(t *testing.T) {
 	err := errors.New("error")
@@ -40,68 +45,43 @@ func Test(t *testing.T) {
 
 func testError(t *testing.T, err error) {
 	t.Helper()
-	s := err.Error()
-	expected := "test: error"
-	if s != expected {
-		t.Fatalf("unexpected message: got %q, want %q", s, expected)
-	}
+	assert.ErrorEqual(t, err, "test: error")
 }
 
 func testVerbose(t *testing.T, err error) {
 	t.Helper()
 	s := errverbose.String(err)
-	expected := regexp.MustCompile(`^test: error\nvalue c = d\ntag a = b\ntemporary = true\nignored\nstack\n(\t.+ .+:\d+\n)+\n$`)
-	if !expected.MatchString(s) {
-		t.Fatalf("unexpected verbose message:\ngot: %q\nwant match: %q", s, expected)
-	}
+	assert.RegexpMatch(t, `^test: error\nvalue c = d\ntag a = b\ntemporary = true\nignored\nstack\n(\t.+ .+:\d+\n)+\n$`, s)
 }
 
 func testStack(t *testing.T, err error) {
 	t.Helper()
 	sfs := errstack.Frames(err)
-	if len(sfs) != 1 {
-		t.Fatalf("unexpected stack frames length: got %d, want 1", len(sfs))
-	}
+	assert.SliceLen(t, sfs, 1)
 	sf := sfs[0]
 	f, _ := sf.Next()
-	expectedFunction := "github.com/pierrre/errors/integrationtest.Test"
-	if f.Function != expectedFunction {
-		t.Fatalf("unexpected function: got %q, want %q", f.Function, expectedFunction)
-	}
+	assert.Equal(t, f.Function, "github.com/pierrre/errors/integrationtest.Test")
 }
 
 func testIgnore(t *testing.T, err error) {
 	t.Helper()
-	if !errignore.Is(err) {
-		t.Fatal("not ignored")
-	}
+	assert.True(t, errignore.Is(err))
 }
 
 func testTemporary(t *testing.T, err error) {
 	t.Helper()
-	if !errtmp.Is(err) {
-		t.Fatal("not temporary")
-	}
+	assert.True(t, errtmp.Is(err))
 }
 
 func testTag(t *testing.T, err error) {
 	t.Helper()
 	tags := errtag.Get(err)
-	if len(tags) != 1 {
-		t.Fatalf("unexpected length: got %d, want %d", len(tags), 1)
-	}
-	if tags["a"] != "b" {
-		t.Fatalf("unexpected tag: got %q, want %q", tags["a"], "b")
-	}
+	assert.MapEqual(t, tags, map[string]string{"a": "b"})
 }
 
 func testValue(t *testing.T, err error) {
 	t.Helper()
 	values := errval.Get(err)
-	if len(values) != 1 {
-		t.Fatalf("unexpected length: got %d, want %d", len(values), 1)
-	}
-	if values["c"] != "d" {
-		t.Fatalf("unexpected tag: got %v, want %q", values["c"], "d")
-	}
+	// TODO use assert.MapEqual with Go 1.20
+	assert.DeepEqual(t, values, map[string]interface{}{"c": "d"})
 }

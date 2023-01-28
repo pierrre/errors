@@ -4,22 +4,24 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/pierrre/errors"
+	"github.com/pierrre/assert"
 	"github.com/pierrre/errors/errbase"
 	. "github.com/pierrre/errors/errtag"
 	"github.com/pierrre/errors/errverbose"
+	"github.com/pierrre/errors/internal/errtest"
 )
+
+func init() {
+	errtest.Configure()
+}
 
 func Test(t *testing.T) {
 	err := errbase.New("error")
 	err = Wrap(err, "foo", "bar")
 	tags := Get(err)
-	if len(tags) != 1 {
-		t.Fatalf("unexpected length: got %d, want %d", len(tags), 1)
-	}
-	if tags["foo"] != "bar" {
-		t.Fatalf("unexpected tag: got %q, want %q", tags["foo"], "bar")
-	}
+	assert.MapEqual(t, tags, map[string]string{
+		"foo": "bar",
+	})
 }
 
 func Example() {
@@ -34,48 +36,36 @@ func TestInt(t *testing.T) {
 	err := errbase.New("error")
 	err = WrapInt(err, "foo", 123)
 	tags := Get(err)
-	if len(tags) != 1 {
-		t.Fatalf("unexpected length: got %d, want %d", len(tags), 1)
-	}
-	if tags["foo"] != "123" {
-		t.Fatalf("unexpected tag: got %q, want %q", tags["foo"], "123")
-	}
+	assert.MapEqual(t, tags, map[string]string{
+		"foo": "123",
+	})
 }
 
 func TestInt64(t *testing.T) {
 	err := errbase.New("error")
 	err = WrapInt64(err, "foo", 123)
 	tags := Get(err)
-	if len(tags) != 1 {
-		t.Fatalf("unexpected length: got %d, want %d", len(tags), 1)
-	}
-	if tags["foo"] != "123" {
-		t.Fatalf("unexpected tag: got %q, want %q", tags["foo"], "123")
-	}
+	assert.MapEqual(t, tags, map[string]string{
+		"foo": "123",
+	})
 }
 
 func TestFloat64(t *testing.T) {
 	err := errbase.New("error")
 	err = WrapFloat64(err, "foo", 12.3)
 	tags := Get(err)
-	if len(tags) != 1 {
-		t.Fatalf("unexpected length: got %d, want %d", len(tags), 1)
-	}
-	if tags["foo"] != "12.3" {
-		t.Fatalf("unexpected tag: got %q, want %q", tags["foo"], "12.3")
-	}
+	assert.MapEqual(t, tags, map[string]string{
+		"foo": "12.3",
+	})
 }
 
 func TestBool(t *testing.T) {
 	err := errbase.New("error")
 	err = WrapBool(err, "foo", true)
 	tags := Get(err)
-	if len(tags) != 1 {
-		t.Fatalf("unexpected length: got %d, want %d", len(tags), 1)
-	}
-	if tags["foo"] != "true" {
-		t.Fatalf("unexpected tag: got %q, want %q", tags["foo"], "true")
-	}
+	assert.MapEqual(t, tags, map[string]string{
+		"foo": "true",
+	})
 }
 
 func TestOverWrite(t *testing.T) {
@@ -83,50 +73,33 @@ func TestOverWrite(t *testing.T) {
 	err = Wrap(err, "test", "1")
 	err = Wrap(err, "test", "2")
 	tags := Get(err)
-	if len(tags) != 1 {
-		t.Fatalf("unexpected length: got %d, want %d", len(tags), 1)
-	}
-	if tags["test"] != "2" {
-		t.Fatalf("unexpected tag: got %q, want %q", tags["test"], "2")
-	}
+	assert.MapEqual(t, tags, map[string]string{
+		"test": "2",
+	})
 }
 
 func TestNil(t *testing.T) {
 	err := Wrap(nil, "foo", "bar")
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.NoError(t, err)
 }
 
 func TestEmpty(t *testing.T) {
 	err := errbase.New("error")
 	tags := Get(err)
-	if len(tags) != 0 {
-		t.Fatalf("tags not empty: got %#v", tags)
-	}
+	assert.MapEmpty(t, tags)
 }
 
 func TestError(t *testing.T) {
 	err := errbase.New("error")
 	err = Wrap(err, "foo", "bar")
-	s := err.Error()
-	expected := "error"
-	if s != expected {
-		t.Fatalf("unexpected message: got %q, want %q", s, expected)
-	}
+	assert.ErrorEqual(t, err, "error")
 }
 
 func TestVerbose(t *testing.T) {
 	err := errbase.New("error")
 	err = Wrap(err, "foo", "bar")
 	var v errverbose.Interface
-	ok := errors.As(err, &v)
-	if !ok {
-		t.Fatal("not a Verbose")
-	}
+	assert.ErrorAs(t, err, &v)
 	s := v.ErrorVerbose()
-	expected := "tag foo = bar"
-	if s != expected {
-		t.Fatalf("unexpected message: got %q, want %q", s, expected)
-	}
+	assert.Equal(t, s, "tag foo = bar")
 }

@@ -2,64 +2,50 @@ package errstack_test
 
 import (
 	"fmt"
-	"regexp"
 	"testing"
 
+	"github.com/pierrre/assert"
 	"github.com/pierrre/errors"
 	"github.com/pierrre/errors/errbase"
 	. "github.com/pierrre/errors/errstack"
 	"github.com/pierrre/errors/errverbose"
+	"github.com/pierrre/errors/internal/errtest"
 )
+
+func init() {
+	errtest.Configure()
+}
 
 func Test(t *testing.T) {
 	err := errbase.New("error")
 	err = Ensure(err)
 	err = Ensure(err)
 	sfs := Frames(err)
-	if len(sfs) != 1 {
-		t.Fatalf("unexpected length: got %d, want %d", len(sfs), 1)
-	}
+	assert.SliceLen(t, sfs, 1)
 	sf := sfs[0]
-	if sf == nil {
-		t.Fatal("no stack frames")
-	}
+	assert.NotZero(t, sf)
 	f, _ := sf.Next()
-	expectedFunction := "github.com/pierrre/errors/errstack_test.Test"
-	if f.Function != expectedFunction {
-		t.Fatalf("unexpected function: got %q, want %q", f.Function, expectedFunction)
-	}
+	assert.Equal(t, f.Function, "github.com/pierrre/errors/errstack_test.Test")
 }
 
 func TestNil(t *testing.T) {
 	err := Wrap(nil)
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.NoError(t, err)
 }
 
 func TestError(t *testing.T) {
 	err := errbase.New("error")
 	err = Wrap(err)
-	s := err.Error()
-	expected := "error"
-	if s != expected {
-		t.Fatalf("unexpected message: got %q, want %q", s, expected)
-	}
+	assert.ErrorEqual(t, err, "error")
 }
 
 func TestVerbose(t *testing.T) {
 	err := errbase.New("error")
 	err = Wrap(err)
 	var v errverbose.Interface
-	ok := errors.As(err, &v)
-	if !ok {
-		t.Fatal("not a Verbose")
-	}
+	assert.ErrorAs(t, err, &v)
 	s := v.ErrorVerbose()
-	expectedRegexp := regexp.MustCompile(`^stack\n(\t.+ .+:\d+\n)+$`)
-	if !expectedRegexp.MatchString(s) {
-		t.Fatalf("unexpected verbose message:\ngot: %q\nwant match: %q", s, expectedRegexp)
-	}
+	assert.RegexpMatch(t, `^stack\n(\t.+ .+:\d+\n)+$`, s)
 }
 
 func TestStackFrames(t *testing.T) {
@@ -68,14 +54,9 @@ func TestStackFrames(t *testing.T) {
 	var sErr interface {
 		StackFrames() []uintptr
 	}
-	ok := errors.As(err, &sErr)
-	if !ok {
-		t.Fatal("not a stack")
-	}
+	assert.ErrorAs(t, err, &sErr)
 	pcs := sErr.StackFrames()
-	if len(pcs) == 0 {
-		t.Fatal("no stack PCs")
-	}
+	assert.SliceNotEmpty(t, pcs)
 }
 
 func Example() {
