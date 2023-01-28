@@ -64,13 +64,15 @@ func TestAs(t *testing.T) {
 	err = &fs.PathError{Err: err}
 	err = Wrap(err, "test")
 	var pathError *fs.PathError
-	assert.ErrorAs(t, err, &pathError)
+	ok := As(err, &pathError)
+	assert.True(t, ok)
 }
 
 func TestIs(t *testing.T) {
 	errBase := errbase.New("error")
 	err := Wrap(errBase, "test")
-	assert.ErrorIs(t, err, errBase)
+	ok := Is(err, errBase)
+	assert.True(t, ok)
 }
 
 func TestUnwrap(t *testing.T) {
