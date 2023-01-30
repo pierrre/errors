@@ -2,7 +2,7 @@ module github.com/pierrre/errors
 
 go 1.19
 
-require github.com/pierrre/assert v0.0.5
+require github.com/pierrre/assert v0.0.6
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
