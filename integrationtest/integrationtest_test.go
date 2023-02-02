@@ -82,6 +82,5 @@ func testTag(t *testing.T, err error) {
 func testValue(t *testing.T, err error) {
 	t.Helper()
 	values := errval.Get(err)
-	// TODO use assert.MapEqual with Go 1.20
-	assert.DeepEqual(t, values, map[string]interface{}{"c": "d"})
+	assert.MapEqual(t, values, map[string]any{"c": "d"})
 }

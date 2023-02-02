@@ -26,7 +26,7 @@ func Wrap(err error, msg string) error {
 // Wrapf adds a formatted message to an error.
 //
 // See Wrap.
-func Wrapf(err error, format string, args ...interface{}) error {
+func Wrapf(err error, format string, args ...any) error {
 	return Wrap(err, fmt.Sprintf(format, args...))
 }
 

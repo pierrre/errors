@@ -19,8 +19,7 @@ func Test(t *testing.T) {
 	err := errbase.New("error")
 	err = Wrap(err, "foo", "bar")
 	vals := Get(err)
-	// TODO: use assert.MapEqual with Go 1.20.
-	assert.DeepEqual(t, vals, map[string]interface{}{
+	assert.MapEqual(t, vals, map[string]any{
 		"foo": "bar",
 	})
 }
@@ -30,8 +29,7 @@ func TestOverWrite(t *testing.T) {
 	err = Wrap(err, "test", 1)
 	err = Wrap(err, "test", 2)
 	vals := Get(err)
-	// TODO: use assert.MapEqual with Go 1.20.
-	assert.DeepEqual(t, vals, map[string]interface{}{
+	assert.MapEqual(t, vals, map[string]any{
 		"test": 2,
 	})
 }
