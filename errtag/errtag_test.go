@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/pierrre/assert"
+	"github.com/pierrre/errors"
 	"github.com/pierrre/errors/errbase"
 	. "github.com/pierrre/errors/errtag"
 	"github.com/pierrre/errors/errverbose"
@@ -102,4 +103,28 @@ func TestVerbose(t *testing.T) {
 	assert.ErrorAs(t, err, &v)
 	s := v.ErrorVerbose()
 	assert.Equal(t, s, "tag foo = bar")
+}
+
+func TestJoin(t *testing.T) {
+	err := Wrap(
+		errors.Join(
+			Wrap(
+				errors.New("error"),
+				"foo",
+				"baz",
+			),
+			Wrap(
+				errors.New("error"),
+				"aaa",
+				"bbb",
+			),
+		),
+		"foo",
+		"bar",
+	)
+	tags := Get(err)
+	assert.MapEqual(t, tags, map[string]string{
+		"foo": "bar",
+		"aaa": "bbb",
+	})
 }

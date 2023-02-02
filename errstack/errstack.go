@@ -90,7 +90,7 @@ func (err *stack) RuntimeStackFrames() *runtime.Frames {
 // See https://pkg.go.dev/runtime#Frames .
 func Frames(err error) []*runtime.Frames {
 	var fss []*runtime.Frames
-	for ; err != nil; err = std_errors.Unwrap(err) {
+	for ; err != nil; err = stackFramesNext(err, &fss) {
 		err, ok := err.(interface { //nolint:errorlint // We want to compare the current error.
 			RuntimeStackFrames() *runtime.Frames
 		})
@@ -100,6 +100,19 @@ func Frames(err error) []*runtime.Frames {
 		}
 	}
 	return fss
+}
+
+func stackFramesNext(err error, pfss *[]*runtime.Frames) error {
+	switch err := err.(type) { //nolint:errorlint // We want to compare the current error.
+	case interface{ Unwrap() error }:
+		return err.Unwrap() //nolint:wrapcheck // We want to return the wrapped error.
+	case interface{ Unwrap() []error }:
+		for _, err := range err.Unwrap() {
+			fss := Frames(err)
+			*pfss = append(*pfss, fss...)
+		}
+	}
+	return nil
 }
 
 func has(err error) bool {

@@ -59,6 +59,21 @@ func TestStackFrames(t *testing.T) {
 	assert.SliceNotEmpty(t, pcs)
 }
 
+func TestStackJoin(t *testing.T) {
+	err := Wrap(
+		errors.Join(
+			Wrap(
+				errbase.New("error 1"),
+			),
+			Wrap(
+				errbase.New("error 2"),
+			),
+		),
+	)
+	sfs := Frames(err)
+	assert.SliceLen(t, sfs, 3)
+}
+
 func Example() {
 	err := errors.New("error")
 	err = Wrap(err)

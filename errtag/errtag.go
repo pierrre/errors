@@ -4,8 +4,6 @@ package errtag
 import (
 	"fmt"
 	"strconv"
-
-	"github.com/pierrre/errors"
 )
 
 // Wrap adds a tag to an error.
@@ -65,7 +63,12 @@ func (err *tag) Tag() (key string, val string) {
 // Get returns the tags added to an error.
 func Get(err error) map[string]string {
 	tags := make(map[string]string)
-	for ; err != nil; err = errors.Unwrap(err) {
+	get(err, tags)
+	return tags
+}
+
+func get(err error, tags map[string]string) {
+	for ; err != nil; err = getNext(err, tags) {
 		err, ok := err.(interface { //nolint:errorlint // We want to compare the current error.
 			Tag() (key string, val string)
 		})
@@ -79,5 +82,16 @@ func Get(err error) map[string]string {
 		}
 		tags[k] = v
 	}
-	return tags
+}
+
+func getNext(err error, tags map[string]string) error {
+	switch err := err.(type) { //nolint:errorlint // We want to compare the current error.
+	case interface{ Unwrap() error }:
+		return err.Unwrap() //nolint:wrapcheck // We want to return the wrapped error.
+	case interface{ Unwrap() []error }:
+		for _, err := range err.Unwrap() {
+			get(err, tags)
+		}
+	}
+	return nil
 }

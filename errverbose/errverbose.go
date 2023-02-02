@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"io"
 	"strings"
-
-	"github.com/pierrre/errors"
 )
 
 // Interface is an error that provides verbose information.
@@ -23,9 +21,14 @@ type Interface interface {
 // The first line is the error's message.
 // The following lines are the verbose message of the error chain.
 func Write(w io.Writer, err error) {
+	write(w, err, nil)
+}
+
+func write(w io.Writer, err error, depth []int) {
+	writeSub(w, depth)
 	_, _ = fmt.Fprint(w, err)
 	_, _ = io.WriteString(w, "\n")
-	for ; err != nil; err = errors.Unwrap(err) {
+	for ; err != nil; err = writeNext(w, err, depth) {
 		v, ok := err.(Interface) //nolint:errorlint // We want to compare the current error.
 		if ok {
 			s := v.ErrorVerbose()
@@ -33,6 +36,33 @@ func Write(w io.Writer, err error) {
 			_, _ = io.WriteString(w, "\n")
 		}
 	}
+}
+
+func writeSub(w io.Writer, depth []int) {
+	if len(depth) == 0 {
+		return
+	}
+	_, _ = io.WriteString(w, "\nSub error ")
+	for i, d := range depth {
+		if i > 0 {
+			_, _ = io.WriteString(w, ".")
+		}
+		_, _ = fmt.Fprint(w, d)
+	}
+	_, _ = io.WriteString(w, ": ")
+}
+
+func writeNext(w io.Writer, err error, depth []int) error {
+	switch err := err.(type) { //nolint: errorlint // We want to compare the current error.
+	case interface{ Unwrap() error }:
+		return err.Unwrap() //nolint:wrapcheck // We want to return the wrapped error.
+	case interface{ Unwrap() []error }:
+		errs := err.Unwrap()
+		for i, err := range errs {
+			write(w, err, append(depth, i))
+		}
+	}
+	return nil
 }
 
 // String returns the error's verbose message as a string.

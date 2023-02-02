@@ -75,6 +75,15 @@ func TestIs(t *testing.T) {
 	assert.True(t, ok)
 }
 
+func TestJoin(t *testing.T) {
+	err := Join(New("error 1"), New("error 2"))
+	errUnwrap, _ := assert.Type[interface {
+		Unwrap() []error
+	}](t, err)
+	errs := errUnwrap.Unwrap()
+	assert.SliceLen(t, errs, 2)
+}
+
 func TestUnwrap(t *testing.T) {
 	errBase := errbase.New("error")
 	err := Wrap(errBase, "test")
