@@ -60,10 +60,7 @@ func TestUnwrap(t *testing.T) {
 	err1 := errbase.New("error")
 	err2 := Wrap(err1, true)
 	err2 = errors.Unwrap(err2)
-	// TODO: use assert.Equal with Go 1.20.
-	if err2 != err1 { //nolint:errorlint // We want to compare the error.
-		t.Fatal("error not equal")
-	}
+	assert.Equal(t, err2, err1)
 }
 
 func Example() {
