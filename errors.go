@@ -57,7 +57,7 @@ func Is(err, target error) bool {
 //
 // See https://pkg.go.dev/errors#Join .
 func Join(errs ...error) error {
-	return std_errors.Join(errs...) //nolint:wrapcheck // This function is a wrapper.
+	return std_errors.Join(errs...)
 }
 
 // Unwrap calls std_errors.Unwrap.
