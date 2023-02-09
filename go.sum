@@ -1,7 +1,7 @@
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/pierrre/assert v0.1.0 h1:78O235hpsqHucwVL5xPl+ElYo9a33jl9F+G1JjDsQxM=
-github.com/pierrre/assert v0.1.0/go.mod h1:QHA7UIsW7mvVanKrIZ8jUSNtb5Ya05QQ3+0COGTBPAo=
+github.com/pierrre/assert v0.1.1 h1:bs2C1Ryzl38qHwOBy/jioNule9LMdGa9xwDwIDVVYgI=
+github.com/pierrre/assert v0.1.1/go.mod h1:5k9X+75AGM2qAIS96OVpB0057wFIJjjYLPMCQnbQmoU=
 github.com/pierrre/compare v1.1.1 h1:MNGVUesTj2xIPD3QChoFd4GBYV76dMRLsCVDCiCR+Os=
 github.com/pierrre/compare v1.1.1/go.mod h1:M3rK2sFL0CVhG43y3CWCmHBvBzhQ+vLGCKGuioJnokc=
 golang.org/x/exp v0.0.0-20230127193734-31bee513bff7 h1:pXR8mGh4q8ooBT7HXruL4Xa2IxoL8XZ6lOgXY/0Ryg8=
