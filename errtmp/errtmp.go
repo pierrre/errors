@@ -2,7 +2,7 @@
 package errtmp
 
 import (
-	"fmt"
+	"strconv"
 
 	"github.com/pierrre/errors"
 )
@@ -30,7 +30,7 @@ func (err *temporary) Unwrap() error {
 }
 
 func (err *temporary) ErrorVerbose() string {
-	return fmt.Sprintf("temporary = %t", err.tmp)
+	return "temporary = " + strconv.FormatBool(err.tmp)
 }
 
 func (err *temporary) Temporary() bool {
