@@ -2,9 +2,12 @@
 package errverbose
 
 import (
+	"bytes"
 	"fmt"
 	"io"
-	"strings"
+	"sync"
+
+	"github.com/pierrre/errors/internal/strconvio"
 )
 
 // Interface is an error that provides verbose information.
@@ -16,17 +19,26 @@ type Interface interface {
 	ErrorVerbose() string
 }
 
+var depthPool = sync.Pool{
+	New: func() interface{} {
+		return make([]int, 100)
+	},
+}
+
 // Write writes the error's verbose message to the writer.
 //
 // The first line is the error's message.
 // The following lines are the verbose message of the error chain.
 func Write(w io.Writer, err error) {
-	write(w, err, nil)
+	depthItf := depthPool.Get()
+	defer depthPool.Put(depthItf)
+	depth := depthItf.([]int) //nolint:forcetypeassert // The pool only contains []int.
+	write(w, err, depth[:0])
 }
 
 func write(w io.Writer, err error, depth []int) {
 	writeSub(w, depth)
-	_, _ = fmt.Fprint(w, err)
+	_, _ = io.WriteString(w, err.Error())
 	_, _ = io.WriteString(w, "\n")
 	for ; err != nil; err = writeNext(w, err, depth) {
 		v, ok := err.(Interface) //nolint:errorlint // We want to compare the current error.
@@ -47,7 +59,7 @@ func writeSub(w io.Writer, depth []int) {
 		if i > 0 {
 			_, _ = io.WriteString(w, ".")
 		}
-		_, _ = fmt.Fprint(w, d)
+		_, _ = strconvio.WriteInt(w, int64(d), 10)
 	}
 	_, _ = io.WriteString(w, ": ")
 }
@@ -65,10 +77,18 @@ func writeNext(w io.Writer, err error, depth []int) error {
 	return nil
 }
 
+var bufferPool = sync.Pool{
+	New: func() interface{} {
+		return new(bytes.Buffer)
+	},
+}
+
 // String returns the error's verbose message as a string.
 func String(err error) string {
-	var b strings.Builder // TODO use a buffer pool.
-	Write(&b, err)
+	b := bufferPool.Get().(*bytes.Buffer) //nolint:forcetypeassert // The pool only contains bytes.Buffer.
+	defer bufferPool.Put(b)
+	b.Reset()
+	Write(b, err)
 	return b.String()
 }
 

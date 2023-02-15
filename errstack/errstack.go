@@ -2,12 +2,13 @@
 package errstack
 
 import (
+	"bytes"
 	std_errors "errors" // Prevent import cycle.
-	"fmt"
 	"path/filepath"
 	"runtime"
-	"strings"
 	"sync"
+
+	"github.com/pierrre/errors/internal/strconvio"
 )
 
 // Wrap adds a stack to an error.
@@ -54,15 +55,29 @@ func (err *stack) Unwrap() error {
 	return err.error
 }
 
+var bufferPool = sync.Pool{
+	New: func() interface{} {
+		return new(bytes.Buffer)
+	},
+}
+
 func (err *stack) ErrorVerbose() string {
-	b := new(strings.Builder) // TODO use a buffer pool.
+	b := bufferPool.Get().(*bytes.Buffer) //nolint:forcetypeassert // The pool only contains bytes.Buffer.
+	defer bufferPool.Put(b)
+	b.Reset()
 	_, _ = b.WriteString("stack\n")
 	fs := err.RuntimeStackFrames()
 	for more := true; more; {
 		var f runtime.Frame
 		f, more = fs.Next()
 		_, file := filepath.Split(f.File)
-		_, _ = fmt.Fprintf(b, "\t%s %s:%d\n", f.Function, file, f.Line)
+		_, _ = b.WriteString("\t")
+		_, _ = b.WriteString(f.Function)
+		_, _ = b.WriteString(" ")
+		_, _ = b.WriteString(file)
+		_, _ = b.WriteString(":")
+		_, _ = strconvio.WriteInt(b, int64(f.Line), 10)
+		_, _ = b.WriteString("\n")
 	}
 	return b.String()
 }

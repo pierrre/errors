@@ -38,7 +38,7 @@ func (err *value) Unwrap() error {
 }
 
 func (err *value) ErrorVerbose() string {
-	return fmt.Sprintf("value %s = %s", err.key, VerboseStringer(err.val))
+	return "value " + err.key + " = " + VerboseStringer(err.val)
 }
 
 func (err *value) Value() (key string, val any) {

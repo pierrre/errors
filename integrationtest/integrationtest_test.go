@@ -1,6 +1,7 @@
 package integrationtest
 
 import (
+	"io"
 	"testing"
 
 	"github.com/pierrre/assert"
@@ -18,7 +19,9 @@ func init() {
 	errtest.Configure()
 }
 
-func Test(t *testing.T) {
+var errTest error
+
+func init() {
 	err := errors.Join(
 		errors.New("error a"),
 		errors.New("error b"),
@@ -28,6 +31,10 @@ func Test(t *testing.T) {
 	err = errtmp.Wrap(err, true)
 	err = errtag.Wrap(err, "a", "b")
 	err = errval.Wrap(err, "c", "d")
+	errTest = err
+}
+
+func Test(t *testing.T) {
 	for _, tc := range []struct {
 		name string
 		f    func(*testing.T, error)
@@ -41,7 +48,7 @@ func Test(t *testing.T) {
 		{"Value", testValue},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			tc.f(t, err)
+			tc.f(t, errTest)
 		})
 	}
 }
@@ -63,7 +70,7 @@ func testStack(t *testing.T, err error) {
 	assert.SliceLen(t, sfs, 2)
 	for _, sf := range sfs {
 		f, _ := sf.Next()
-		assert.Equal(t, f.Function, "github.com/pierrre/errors/integrationtest.Test")
+		assert.Equal(t, f.Function, "github.com/pierrre/errors/integrationtest.init.1")
 	}
 }
 
@@ -87,4 +94,16 @@ func testValue(t *testing.T, err error) {
 	t.Helper()
 	values := errval.Get(err)
 	assert.MapEqual(t, values, map[string]any{"c": "d"})
+}
+
+func BenchmarkError(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = errTest.Error()
+	}
+}
+
+func BenchmarkVerbose(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		errverbose.Write(io.Discard, errTest)
+	}
 }

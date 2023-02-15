@@ -2,7 +2,6 @@
 package errtag
 
 import (
-	"fmt"
 	"strconv"
 )
 
@@ -53,7 +52,7 @@ func (err *tag) Unwrap() error {
 }
 
 func (err *tag) ErrorVerbose() string {
-	return fmt.Sprintf("tag %s = %s", err.key, err.val)
+	return "tag " + err.key + " = " + err.val
 }
 
 func (err *tag) Tag() (key string, val string) {

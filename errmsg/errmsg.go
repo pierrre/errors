@@ -40,5 +40,5 @@ func (err *message) Unwrap() error {
 }
 
 func (err *message) Error() string {
-	return fmt.Sprintf("%s: %v", err.msg, err.error)
+	return err.msg + ": " + err.error.Error()
 }
