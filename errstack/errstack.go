@@ -2,13 +2,13 @@
 package errstack
 
 import (
-	"bytes"
 	std_errors "errors" // Prevent import cycle.
 	"path/filepath"
 	"runtime"
-	"sync"
 
 	"github.com/pierrre/errors/internal/strconvio"
+	"github.com/pierrre/go-libs/bufpool"
+	"github.com/pierrre/go-libs/syncutil"
 )
 
 // Wrap adds a stack to an error.
@@ -55,14 +55,10 @@ func (err *stack) Unwrap() error {
 	return err.error
 }
 
-var bufferPool = sync.Pool{
-	New: func() interface{} {
-		return new(bytes.Buffer)
-	},
-}
+var bufferPool = bufpool.Pool{}
 
 func (err *stack) ErrorVerbose() string {
-	b := bufferPool.Get().(*bytes.Buffer) //nolint:forcetypeassert // The pool only contains bytes.Buffer.
+	b := bufferPool.Get()
 	defer bufferPool.Put(b)
 	b.Reset()
 	_, _ = b.WriteString("stack\n")
@@ -139,16 +135,17 @@ func has(err error) bool {
 
 const callersMaxLength = 1 << 16
 
-var callersPool = sync.Pool{
-	New: func() any {
-		return make([]uintptr, callersMaxLength)
+var callersPool = syncutil.Pool[[]uintptr]{
+	New: func() *[]uintptr {
+		pc := make([]uintptr, callersMaxLength)
+		return &pc
 	},
 }
 
 func callers(skip int) []uintptr {
-	pcItf := callersPool.Get()
-	defer callersPool.Put(pcItf)
-	pc := pcItf.([]uintptr) //nolint:forcetypeassert // The pool always contains []uintptr.
+	pcp := callersPool.Get()
+	defer callersPool.Put(pcp)
+	pc := *pcp
 	n := runtime.Callers(skip+2, pc)
 	pcRes := make([]uintptr, n)
 	copy(pcRes, pc)

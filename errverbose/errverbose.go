@@ -2,12 +2,12 @@
 package errverbose
 
 import (
-	"bytes"
 	"fmt"
 	"io"
-	"sync"
 
 	"github.com/pierrre/errors/internal/strconvio"
+	"github.com/pierrre/go-libs/bufpool"
+	"github.com/pierrre/go-libs/syncutil"
 )
 
 // Interface is an error that provides verbose information.
@@ -19,9 +19,10 @@ type Interface interface {
 	ErrorVerbose() string
 }
 
-var depthPool = sync.Pool{
-	New: func() interface{} {
-		return make([]int, 100)
+var depthPool = syncutil.Pool[[]int]{
+	New: func() *[]int {
+		depth := make([]int, 100)
+		return &depth
 	},
 }
 
@@ -30,9 +31,9 @@ var depthPool = sync.Pool{
 // The first line is the error's message.
 // The following lines are the verbose message of the error chain.
 func Write(w io.Writer, err error) {
-	depthItf := depthPool.Get()
-	defer depthPool.Put(depthItf)
-	depth := depthItf.([]int) //nolint:forcetypeassert // The pool only contains []int.
+	depthP := depthPool.Get()
+	defer depthPool.Put(depthP)
+	depth := *depthP
 	write(w, err, depth[:0])
 }
 
@@ -77,15 +78,11 @@ func writeNext(w io.Writer, err error, depth []int) error {
 	return nil
 }
 
-var bufferPool = sync.Pool{
-	New: func() interface{} {
-		return new(bytes.Buffer)
-	},
-}
+var bufferPool = bufpool.Pool{}
 
 // String returns the error's verbose message as a string.
 func String(err error) string {
-	b := bufferPool.Get().(*bytes.Buffer) //nolint:forcetypeassert // The pool only contains bytes.Buffer.
+	b := bufferPool.Get()
 	defer bufferPool.Put(b)
 	b.Reset()
 	Write(b, err)
