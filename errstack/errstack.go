@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/pierrre/errors/internal/strconvio"
 	"github.com/pierrre/go-libs/bufpool"
+	"github.com/pierrre/go-libs/strconvio"
 	"github.com/pierrre/go-libs/syncutil"
 )
 
