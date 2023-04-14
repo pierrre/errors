@@ -19,6 +19,8 @@ func New(msg string) error {
 }
 
 // Newf creates a new error with the given formatted message.
+//
+// It doesn't support the %w verb.
 func Newf(format string, args ...any) error {
 	return New(fmt.Sprintf(format, args...))
 }
