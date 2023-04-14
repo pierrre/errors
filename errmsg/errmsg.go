@@ -27,7 +27,7 @@ func Wrap(err error, msg string) error {
 //
 // See Wrap.
 //
-// it doesn't support the %w verb.
+// It doesn't support the %w verb.
 func Wrapf(err error, format string, args ...any) error {
 	return Wrap(err, fmt.Sprintf(format, args...))
 }

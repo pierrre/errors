@@ -19,6 +19,8 @@ func New(msg string) error {
 }
 
 // Newf returns a new error with a formatted message and a stack.
+//
+// It doesn't support the %w verb.
 func Newf(format string, args ...any) error {
 	err := errbase.Newf(format, args...)
 	err = errstack.WrapSkip(err, 1)
@@ -33,6 +35,8 @@ func Wrap(err error, msg string) error {
 }
 
 // Wrapf adds a formatted message to an error, and a stack if it doesn't have one.
+//
+// It doesn't support the %w verb.
 func Wrapf(err error, format string, args ...any) error {
 	err = errstack.EnsureSkip(err, 1)
 	err = errmsg.Wrapf(err, format, args...)
