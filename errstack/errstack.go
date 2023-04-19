@@ -60,7 +60,6 @@ var bufferPool = bufpool.Pool{}
 func (err *stack) ErrorVerbose() string {
 	b := bufferPool.Get()
 	defer bufferPool.Put(b)
-	b.Reset()
 	_, _ = b.WriteString("stack\n")
 	fs := err.RuntimeStackFrames()
 	for more := true; more; {

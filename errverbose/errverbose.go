@@ -84,7 +84,6 @@ var bufferPool = bufpool.Pool{}
 func String(err error) string {
 	b := bufferPool.Get()
 	defer bufferPool.Put(b)
-	b.Reset()
 	Write(b, err)
 	return b.String()
 }
