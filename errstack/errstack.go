@@ -5,10 +5,10 @@ import (
 	std_errors "errors" // Prevent import cycle.
 	"path/filepath"
 	"runtime"
+	"sync"
 
 	"github.com/pierrre/go-libs/bufpool"
 	"github.com/pierrre/go-libs/strconvio"
-	"github.com/pierrre/go-libs/syncutil"
 )
 
 // Wrap adds a stack to an error.
@@ -134,17 +134,16 @@ func has(err error) bool {
 
 const callersMaxLength = 1 << 16
 
-var callersPool = syncutil.Pool[[]uintptr]{
-	New: func() *[]uintptr {
-		pc := make([]uintptr, callersMaxLength)
-		return &pc
+var callersPool = sync.Pool{
+	New: func() any {
+		return make([]uintptr, callersMaxLength)
 	},
 }
 
 func callers(skip int) []uintptr {
-	pcp := callersPool.Get()
-	defer callersPool.Put(pcp)
-	pc := *pcp
+	pcItf := callersPool.Get()
+	defer callersPool.Put(pcItf)
+	pc := pcItf.([]uintptr)
 	n := runtime.Callers(skip+2, pc)
 	pcRes := make([]uintptr, n)
 	copy(pcRes, pc)

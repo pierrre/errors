@@ -4,10 +4,10 @@ package errverbose
 import (
 	"fmt"
 	"io"
+	"sync"
 
 	"github.com/pierrre/go-libs/bufpool"
 	"github.com/pierrre/go-libs/strconvio"
-	"github.com/pierrre/go-libs/syncutil"
 )
 
 // Interface is an error that provides verbose information.
@@ -19,10 +19,9 @@ type Interface interface {
 	ErrorVerbose() string
 }
 
-var depthPool = syncutil.Pool[[]int]{
-	New: func() *[]int {
-		depth := make([]int, 100)
-		return &depth
+var depthPool = sync.Pool{
+	New: func() any {
+		return make([]int, 100)
 	},
 }
 
@@ -31,9 +30,9 @@ var depthPool = syncutil.Pool[[]int]{
 // The first line is the error's message.
 // The following lines are the verbose message of the error chain.
 func Write(w io.Writer, err error) {
-	depthP := depthPool.Get()
-	defer depthPool.Put(depthP)
-	depth := *depthP
+	depthItf := depthPool.Get()
+	defer depthPool.Put(depthItf)
+	depth := depthItf.([]int)
 	write(w, err, depth[:0])
 }
 
