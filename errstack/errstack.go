@@ -143,7 +143,7 @@ var callersPool = sync.Pool{
 func callers(skip int) []uintptr {
 	pcItf := callersPool.Get()
 	defer callersPool.Put(pcItf)
-	pc := pcItf.([]uintptr)
+	pc := pcItf.([]uintptr) //nolint:forcetypeassert // The pool only contains []uintptr.
 	n := runtime.Callers(skip+2, pc)
 	pcRes := make([]uintptr, n)
 	copy(pcRes, pc)

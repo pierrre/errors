@@ -32,7 +32,7 @@ var depthPool = sync.Pool{
 func Write(w io.Writer, err error) {
 	depthItf := depthPool.Get()
 	defer depthPool.Put(depthItf)
-	depth := depthItf.([]int)
+	depth := depthItf.([]int) //nolint:forcetypeassert // The pool only contains []int.
 	write(w, err, depth[:0])
 }
 
