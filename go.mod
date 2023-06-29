@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/pierrre/assert v0.1.6
 	github.com/pierrre/go-libs v0.2.5
-	github.com/pierrre/pretty v0.0.2
+	github.com/pierrre/pretty v0.0.3
 )
 
 require (
