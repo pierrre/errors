@@ -3,6 +3,7 @@ package errors_test
 import (
 	"fmt"
 	"io/fs"
+	"runtime"
 	"testing"
 
 	"github.com/pierrre/assert"
@@ -14,6 +15,19 @@ import (
 
 func init() {
 	errtest.Configure()
+}
+
+func ExampleNew() {
+	err := New("error")
+	fmt.Println(err)
+	// Output: error
+}
+
+func ExampleWrap() {
+	err := errbase.New("error")
+	err = Wrap(err, "wrap")
+	fmt.Println(err)
+	// Output: wrap: error
 }
 
 func TestNew(t *testing.T) {
@@ -30,12 +44,6 @@ func TestNewf(t *testing.T) {
 	assert.SliceLen(t, sfs, 1)
 }
 
-func ExampleNew() {
-	err := New("error")
-	fmt.Println(err)
-	// Output: error
-}
-
 func TestWrap(t *testing.T) {
 	err := errbase.New("error")
 	err = Wrap(err, "test")
@@ -50,13 +58,6 @@ func TestWrapf(t *testing.T) {
 	assert.ErrorEqual(t, err, "test 1: error")
 	sfs := errstack.Frames(err)
 	assert.SliceLen(t, sfs, 1)
-}
-
-func ExampleWrap() {
-	err := errbase.New("error")
-	err = Wrap(err, "wrap")
-	fmt.Println(err)
-	// Output: wrap: error
 }
 
 func TestAs(t *testing.T) {
@@ -90,4 +91,72 @@ func TestUnwrap(t *testing.T) {
 	err = Unwrap(err)
 	err = Unwrap(err)
 	assert.Equal(t, err, errBase)
+}
+
+func TestNewAllocs(t *testing.T) {
+	var res error
+	assert.AllocsPerRun(t, 100, func() {
+		res = New("error")
+	}, 3)
+	runtime.KeepAlive(res)
+}
+
+func TestNewfAllocs(t *testing.T) {
+	var res error
+	assert.AllocsPerRun(t, 100, func() {
+		res = Newf("error %d", 1)
+	}, 4)
+	runtime.KeepAlive(res)
+}
+
+func TestWrapAllocs(t *testing.T) {
+	err := errbase.New("error")
+	var res error
+	assert.AllocsPerRun(t, 100, func() {
+		res = Wrap(err, "test")
+	}, 4)
+	runtime.KeepAlive(res)
+}
+
+func TestWrapfAllocs(t *testing.T) {
+	err := errbase.New("error")
+	var res error
+	assert.AllocsPerRun(t, 100, func() {
+		res = Wrapf(err, "test %d", 1)
+	}, 5)
+	runtime.KeepAlive(res)
+}
+
+func BenchmarkNew(b *testing.B) {
+	var res error
+	for i := 0; i < b.N; i++ {
+		res = New("error")
+	}
+	runtime.KeepAlive(res)
+}
+
+func BenchmarkNewf(b *testing.B) {
+	var res error
+	for i := 0; i < b.N; i++ {
+		res = Newf("error %d", 1)
+	}
+	runtime.KeepAlive(res)
+}
+
+func BenchmarkWrap(b *testing.B) {
+	err := errbase.New("error")
+	var res error
+	for i := 0; i < b.N; i++ {
+		res = Wrap(err, "test")
+	}
+	runtime.KeepAlive(res)
+}
+
+func BenchmarkWrapf(b *testing.B) {
+	err := errbase.New("error")
+	var res error
+	for i := 0; i < b.N; i++ {
+		res = Wrapf(err, "test %d", 1)
+	}
+	runtime.KeepAlive(res)
 }

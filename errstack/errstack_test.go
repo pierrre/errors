@@ -2,6 +2,7 @@ package errstack_test
 
 import (
 	"fmt"
+	"runtime"
 	"testing"
 
 	"github.com/pierrre/assert"
@@ -14,6 +15,17 @@ import (
 
 func init() {
 	errtest.Configure()
+}
+
+func Example() {
+	err := errors.New("error")
+	err = Wrap(err)
+	fmt.Println(err)
+	sfs := Frames(err)
+	fmt.Println(len(sfs))
+	// Output:
+	// error
+	// 2
 }
 
 func Test(t *testing.T) {
@@ -59,7 +71,7 @@ func TestStackFrames(t *testing.T) {
 	assert.SliceNotEmpty(t, pcs)
 }
 
-func TestStackJoin(t *testing.T) {
+func TestJoin(t *testing.T) {
 	err := Wrap(
 		errors.Join(
 			Wrap(
@@ -74,13 +86,84 @@ func TestStackJoin(t *testing.T) {
 	assert.SliceLen(t, sfs, 3)
 }
 
-func Example() {
-	err := errors.New("error")
+func TestWrapAllocs(t *testing.T) {
+	err := errbase.New("error")
+	var res error
+	assert.AllocsPerRun(t, 100, func() {
+		res = Wrap(err)
+	}, 2)
+	runtime.KeepAlive(res)
+}
+
+func TestEnsureAllocs(t *testing.T) {
+	err := errbase.New("error")
+	err = Ensure(err)
+	var res error
+	assert.AllocsPerRun(t, 100, func() {
+		res = Ensure(err)
+	}, 1)
+	runtime.KeepAlive(res)
+}
+
+func TestFramesAllocs(t *testing.T) {
+	err := errbase.New("error")
 	err = Wrap(err)
-	fmt.Println(err)
-	sfs := Frames(err)
-	fmt.Println(len(sfs))
-	// Output:
-	// error
-	// 2
+	var res []*runtime.Frames
+	assert.AllocsPerRun(t, 100, func() {
+		res = Frames(err)
+	}, 2)
+	runtime.KeepAlive(res)
+}
+
+func TestVerboseAllocs(t *testing.T) {
+	err := errbase.New("error")
+	err = Wrap(err)
+	var v errverbose.Interface
+	assert.ErrorAs(t, err, &v)
+	var res string
+	assert.AllocsPerRun(t, 100, func() {
+		res = v.ErrorVerbose()
+	}, 2)
+	runtime.KeepAlive(res)
+}
+
+func BenchmarkWrap(b *testing.B) {
+	err := errbase.New("error")
+	var res error
+	for i := 0; i < b.N; i++ {
+		res = Wrap(err)
+	}
+	runtime.KeepAlive(res)
+}
+
+func BenchmarkEnsure(b *testing.B) {
+	err := errbase.New("error")
+	err = Ensure(err)
+	var res error
+	for i := 0; i < b.N; i++ {
+		res = Ensure(err)
+	}
+	runtime.KeepAlive(res)
+}
+
+func BenchmarkFrames(b *testing.B) {
+	err := errbase.New("error")
+	err = Wrap(err)
+	var res []*runtime.Frames
+	for i := 0; i < b.N; i++ {
+		res = Frames(err)
+	}
+	runtime.KeepAlive(res)
+}
+
+func BenchmarkVerbose(b *testing.B) {
+	err := errbase.New("error")
+	err = Wrap(err)
+	var v errverbose.Interface
+	assert.ErrorAs(b, err, &v)
+	var res string
+	for i := 0; i < b.N; i++ {
+		res = v.ErrorVerbose()
+	}
+	runtime.KeepAlive(res)
 }
