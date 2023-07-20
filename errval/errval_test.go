@@ -2,6 +2,7 @@ package errval_test
 
 import (
 	"fmt"
+	"runtime"
 	"testing"
 
 	"github.com/pierrre/assert"
@@ -14,6 +15,14 @@ import (
 
 func init() {
 	errtest.Configure()
+}
+
+func Example() {
+	err := errbase.New("error")
+	err = Wrap(err, "foo", "bar")
+	vals := Get(err)
+	fmt.Println(vals["foo"])
+	// Output: bar
 }
 
 func Test(t *testing.T) {
@@ -85,10 +94,64 @@ func TestJoin(t *testing.T) {
 	})
 }
 
-func Example() {
+func TestWrapAllocs(t *testing.T) {
+	err := errbase.New("error")
+	var res error
+	assert.AllocsPerRun(t, 100, func() {
+		res = Wrap(err, "foo", "bar")
+	}, 1)
+	runtime.KeepAlive(res)
+}
+
+func TestGetAllocs(t *testing.T) {
 	err := errbase.New("error")
 	err = Wrap(err, "foo", "bar")
-	vals := Get(err)
-	fmt.Println(vals["foo"])
-	// Output: bar
+	var res map[string]any
+	assert.AllocsPerRun(t, 100, func() {
+		res = Get(err)
+	}, 2)
+	runtime.KeepAlive(res)
+}
+
+func TestVerboseAllocs(t *testing.T) {
+	err := errbase.New("error")
+	err = Wrap(err, "foo", "bar")
+	var v errverbose.Interface
+	assert.ErrorAs(t, err, &v)
+	var res string
+	assert.AllocsPerRun(t, 100, func() {
+		res = v.ErrorVerbose()
+	}, 2)
+	runtime.KeepAlive(res)
+}
+
+func BenchmarkWrap(b *testing.B) {
+	err := errbase.New("error")
+	var res error
+	for i := 0; i < b.N; i++ {
+		res = Wrap(err, "foo", "bar")
+	}
+	runtime.KeepAlive(res)
+}
+
+func BenchmarkGet(b *testing.B) {
+	err := errbase.New("error")
+	err = Wrap(err, "foo", "bar")
+	var res map[string]any
+	for i := 0; i < b.N; i++ {
+		res = Get(err)
+	}
+	runtime.KeepAlive(res)
+}
+
+func BenchmarkVerbose(b *testing.B) {
+	err := errbase.New("error")
+	err = Wrap(err, "foo", "bar")
+	var v errverbose.Interface
+	assert.ErrorAs(b, err, &v)
+	var res string
+	for i := 0; i < b.N; i++ {
+		res = v.ErrorVerbose()
+	}
+	runtime.KeepAlive(res)
 }

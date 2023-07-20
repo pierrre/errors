@@ -2,6 +2,7 @@ package errmsg_test
 
 import (
 	"fmt"
+	"runtime"
 	"testing"
 
 	"github.com/pierrre/assert"
@@ -13,6 +14,13 @@ import (
 
 func init() {
 	errtest.Configure()
+}
+
+func Example() {
+	err := errbase.New("error")
+	err = Wrap(err, "message")
+	fmt.Println(err)
+	// Output: message: error
 }
 
 func Test(t *testing.T) {
@@ -39,9 +47,58 @@ func TestUnwrap(t *testing.T) {
 	assert.Equal(t, err2, err1)
 }
 
-func Example() {
+func TestWrapAllocs(t *testing.T) {
 	err := errbase.New("error")
-	err = Wrap(err, "message")
-	fmt.Println(err)
-	// Output: message: error
+	var res error
+	assert.AllocsPerRun(t, 100, func() {
+		res = Wrap(err, "test")
+	}, 1)
+	runtime.KeepAlive(res)
+}
+
+func TestWrapfAllocs(t *testing.T) {
+	err := errbase.New("error")
+	var res error
+	assert.AllocsPerRun(t, 100, func() {
+		res = Wrapf(err, "test %d", 1)
+	}, 2)
+	runtime.KeepAlive(res)
+}
+
+func TestErrorAllocs(t *testing.T) {
+	err := errbase.New("error")
+	err = Wrap(err, "test")
+	var res string
+	assert.AllocsPerRun(t, 100, func() {
+		res = err.Error()
+	}, 1)
+	runtime.KeepAlive(res)
+}
+
+func BenchmarkWrap(b *testing.B) {
+	err := errbase.New("error")
+	var res error
+	for i := 0; i < b.N; i++ {
+		res = Wrap(err, "test")
+	}
+	runtime.KeepAlive(res)
+}
+
+func BenchmarkWrapf(b *testing.B) {
+	err := errbase.New("error")
+	var res error
+	for i := 0; i < b.N; i++ {
+		res = Wrapf(err, "test %d", 1)
+	}
+	runtime.KeepAlive(res)
+}
+
+func BenchmarkError(b *testing.B) {
+	err := errbase.New("error")
+	err = Wrap(err, "test")
+	var res string
+	for i := 0; i < b.N; i++ {
+		res = err.Error()
+	}
+	runtime.KeepAlive(res)
 }
