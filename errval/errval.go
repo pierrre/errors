@@ -3,6 +3,8 @@ package errval
 
 import (
 	"fmt"
+
+	"github.com/pierrre/errors/erriter"
 )
 
 // VerboseStringer returns the string representation of a value in a verbose message.
@@ -48,35 +50,19 @@ func (err *value) Value() (key string, val any) {
 // Get returns the values added to an error.
 func Get(err error) map[string]any {
 	vals := make(map[string]any)
-	get(err, vals)
-	return vals
-}
-
-func get(err error, vals map[string]any) {
-	for ; err != nil; err = getNext(err, vals) {
-		err, ok := err.(interface { //nolint:errorlint // We want to compare the current error.
+	erriter.Iter(err, func(err error) {
+		errv, ok := err.(interface { //nolint:errorlint // We want to compare the current error.
 			Value() (key string, val any)
 		})
 		if !ok {
-			continue
+			return
 		}
-		k, v := err.Value()
+		k, v := errv.Value()
 		_, ok = vals[k]
 		if ok {
-			continue
+			return
 		}
 		vals[k] = v
-	}
-}
-
-func getNext(err error, vals map[string]any) error {
-	switch err := err.(type) { //nolint:errorlint // We want to compare the current error.
-	case interface{ Unwrap() error }:
-		return err.Unwrap() //nolint:wrapcheck // We want to return the wrapped error.
-	case interface{ Unwrap() []error }:
-		for _, err := range err.Unwrap() {
-			get(err, vals)
-		}
-	}
-	return nil
+	})
+	return vals
 }

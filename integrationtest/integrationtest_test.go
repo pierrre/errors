@@ -89,7 +89,7 @@ func TestStackAllocs(t *testing.T) {
 	var res []*runtime.Frames
 	assert.AllocsPerRun(t, 100, func() {
 		errstack.Frames(errTest)
-	}, 6)
+	}, 4)
 	runtime.KeepAlive(res)
 }
 
