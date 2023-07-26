@@ -101,7 +101,7 @@ func TestEnsureAllocs(t *testing.T) {
 	var res error
 	assert.AllocsPerRun(t, 100, func() {
 		res = Ensure(err)
-	}, 1)
+	}, 0)
 	runtime.KeepAlive(res)
 }
 

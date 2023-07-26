@@ -20,7 +20,7 @@ func New(msg string) error {
 
 // Newf returns a new error with a formatted message and a stack.
 //
-// It doesn't support the %w verb.
+// It supports the %w verb.
 func Newf(format string, args ...any) error {
 	err := errbase.Newf(format, args...)
 	err = errstack.WrapSkip(err, 1)

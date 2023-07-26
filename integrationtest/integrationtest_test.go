@@ -75,14 +75,14 @@ func TestErrorAllocs(t *testing.T) {
 	var res string
 	assert.AllocsPerRun(t, 100, func() {
 		res = errTest.Error()
-	}, 4)
+	}, 0)
 	runtime.KeepAlive(res)
 }
 
 func TestVerboseAllocs(t *testing.T) {
 	assert.AllocsPerRun(t, 100, func() {
 		errverbose.Write(io.Discard, errTest)
-	}, 11)
+	}, 7)
 }
 
 func TestStackAllocs(t *testing.T) {

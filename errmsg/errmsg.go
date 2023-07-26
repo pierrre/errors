@@ -19,7 +19,7 @@ func Wrap(err error, msg string) error {
 	}
 	return &message{
 		error: err,
-		msg:   msg,
+		msg:   msg + ": " + err.Error(),
 	}
 }
 
@@ -42,5 +42,5 @@ func (err *message) Unwrap() error {
 }
 
 func (err *message) Error() string {
-	return err.msg + ": " + err.error.Error()
+	return err.msg
 }

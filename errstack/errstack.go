@@ -7,6 +7,7 @@ import (
 	"runtime"
 	"sync"
 
+	"github.com/pierrre/errors/errbase"
 	"github.com/pierrre/go-libs/bufpool"
 	"github.com/pierrre/go-libs/strconvio"
 )
@@ -53,6 +54,10 @@ type stack struct {
 
 func (err *stack) Unwrap() error {
 	return err.error
+}
+
+func (err *stack) Is(target error) bool {
+	return target == err || target == errHas
 }
 
 var bufferPool = bufpool.Pool{}
@@ -125,11 +130,10 @@ func stackFramesNext(err error, pfss *[]*runtime.Frames) error {
 	return nil
 }
 
+var errHas = errbase.New("stack")
+
 func has(err error) bool {
-	var werr interface {
-		RuntimeStackFrames() *runtime.Frames
-	}
-	return std_errors.As(err, &werr)
+	return std_errors.Is(err, errHas)
 }
 
 const callersMaxLength = 1 << 16
