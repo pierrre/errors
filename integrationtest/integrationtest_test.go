@@ -20,9 +20,7 @@ func init() {
 	errtest.Configure()
 }
 
-var errTest error
-
-func init() {
+func newTestError() error {
 	err := errors.Join(
 		errors.New("error a"),
 		errors.New("error b"),
@@ -32,149 +30,186 @@ func init() {
 	err = errtmp.Wrap(err, true)
 	err = errtag.Wrap(err, "a", "b")
 	err = errval.Wrap(err, "c", "d")
-	errTest = err
+	return err
 }
 
 func TestError(t *testing.T) {
-	assert.ErrorEqual(t, errTest, "test: error a\nerror b")
+	err := newTestError()
+	assert.ErrorEqual(t, err, "test: error a\nerror b")
 }
 
 func TestVerbose(t *testing.T) {
-	s := errverbose.String(errTest)
+	err := newTestError()
+	s := errverbose.String(err)
 	assert.RegexpMatch(t, `^test: error a\nerror b\nvalue c = d\ntag a = b\ntemporary = true\nignored\n\nSub error 0: error a\nstack\n(\t.+ .+:\d+\n)+\n\nSub error 1: error b\nstack\n(\t.+ .+:\d+\n)+\n$`, s)
 }
 
 func TestStack(t *testing.T) {
-	sfs := errstack.Frames(errTest)
+	err := newTestError()
+	sfs := errstack.Frames(err)
 	assert.SliceLen(t, sfs, 2)
 	for _, sf := range sfs {
 		f, _ := sf.Next()
-		assert.Equal(t, f.Function, "github.com/pierrre/errors/integrationtest.init.1")
+		assert.Equal(t, f.Function, "github.com/pierrre/errors/integrationtest.newTestError")
 	}
 }
 
 func TestIgnore(t *testing.T) {
-	assert.True(t, errignore.Is(errTest))
+	err := newTestError()
+	assert.True(t, errignore.Is(err))
 }
 
 func TestTemporary(t *testing.T) {
-	assert.True(t, errtmp.Is(errTest))
+	err := newTestError()
+	assert.True(t, errtmp.Is(err))
 }
 
 func TestTag(t *testing.T) {
-	tags := errtag.Get(errTest)
+	err := newTestError()
+	tags := errtag.Get(err)
 	assert.MapEqual(t, tags, map[string]string{"a": "b"})
 }
 
 func TestValue(t *testing.T) {
-	values := errval.Get(errTest)
+	err := newTestError()
+	values := errval.Get(err)
 	assert.MapEqual(t, values, map[string]any{"c": "d"})
 }
 
+func TestNewAllocs(t *testing.T) {
+	var res error
+	assert.AllocsPerRun(t, 100, func() {
+		res = newTestError()
+	}, 17)
+	runtime.KeepAlive(res)
+}
+
 func TestErrorAllocs(t *testing.T) {
+	err := newTestError()
 	var res string
 	assert.AllocsPerRun(t, 100, func() {
-		res = errTest.Error()
+		res = err.Error()
 	}, 0)
 	runtime.KeepAlive(res)
 }
 
 func TestVerboseAllocs(t *testing.T) {
+	err := newTestError()
 	assert.AllocsPerRun(t, 100, func() {
-		errverbose.Write(io.Discard, errTest)
+		errverbose.Write(io.Discard, err)
 	}, 7)
 }
 
 func TestStackAllocs(t *testing.T) {
+	err := newTestError()
 	var res []*runtime.Frames
 	assert.AllocsPerRun(t, 100, func() {
-		errstack.Frames(errTest)
+		errstack.Frames(err)
 	}, 4)
 	runtime.KeepAlive(res)
 }
 
 func TestIgnoreAllocs(t *testing.T) {
+	err := newTestError()
 	var res bool
 	assert.AllocsPerRun(t, 100, func() {
-		res = errignore.Is(errTest)
+		res = errignore.Is(err)
 	}, 1)
 	runtime.KeepAlive(res)
 }
 
 func TestTemporaryAllocs(t *testing.T) {
+	err := newTestError()
 	var res bool
 	assert.AllocsPerRun(t, 100, func() {
-		res = errtmp.Is(errTest)
+		res = errtmp.Is(err)
 	}, 1)
 	runtime.KeepAlive(res)
 }
 
 func TestTagAllocs(t *testing.T) {
+	err := newTestError()
 	var res map[string]string
 	assert.AllocsPerRun(t, 100, func() {
-		res = errtag.Get(errTest)
+		res = errtag.Get(err)
 	}, 2)
 	runtime.KeepAlive(res)
 }
 
 func TestValueAllocs(t *testing.T) {
+	err := newTestError()
 	var res map[string]any
 	assert.AllocsPerRun(t, 100, func() {
-		res = errval.Get(errTest)
+		res = errval.Get(err)
 	}, 2)
 	runtime.KeepAlive(res)
 }
 
+func BenchmarkNew(b *testing.B) {
+	var res error
+	for i := 0; i < b.N; i++ {
+		res = newTestError()
+	}
+	runtime.KeepAlive(res)
+}
+
 func BenchmarkError(b *testing.B) {
+	err := newTestError()
 	var res string
 	for i := 0; i < b.N; i++ {
-		res = errTest.Error()
+		res = err.Error()
 	}
 	runtime.KeepAlive(res)
 }
 
 func BenchmarkVerbose(b *testing.B) {
+	err := newTestError()
 	for i := 0; i < b.N; i++ {
-		errverbose.Write(io.Discard, errTest)
+		errverbose.Write(io.Discard, err)
 	}
 }
 
 func BenchmarkStack(b *testing.B) {
+	err := newTestError()
 	var res []*runtime.Frames
 	for i := 0; i < b.N; i++ {
-		res = errstack.Frames(errTest)
+		res = errstack.Frames(err)
 	}
 	runtime.KeepAlive(res)
 }
 
 func BenchmarkIgnore(b *testing.B) {
+	err := newTestError()
 	var res bool
 	for i := 0; i < b.N; i++ {
-		res = errignore.Is(errTest)
+		res = errignore.Is(err)
 	}
 	runtime.KeepAlive(res)
 }
 
 func BenchmarkTemporary(b *testing.B) {
+	err := newTestError()
 	var res bool
 	for i := 0; i < b.N; i++ {
-		res = errtmp.Is(errTest)
+		res = errtmp.Is(err)
 	}
 	runtime.KeepAlive(res)
 }
 
 func BenchmarkTag(b *testing.B) {
+	err := newTestError()
 	var res map[string]string
 	for i := 0; i < b.N; i++ {
-		res = errtag.Get(errTest)
+		res = errtag.Get(err)
 	}
 	runtime.KeepAlive(res)
 }
 
 func BenchmarkValue(b *testing.B) {
+	err := newTestError()
 	var res map[string]any
 	for i := 0; i < b.N; i++ {
-		res = errval.Get(errTest)
+		res = errval.Get(err)
 	}
 	runtime.KeepAlive(res)
 }
