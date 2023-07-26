@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	"github.com/pierrre/errors/errbase"
+	"github.com/pierrre/errors/erriter"
 	"github.com/pierrre/go-libs/bufpool"
 	"github.com/pierrre/go-libs/strconvio"
 )
@@ -105,29 +106,16 @@ func (err *stack) RuntimeStackFrames() *runtime.Frames {
 // See https://pkg.go.dev/runtime#Frames .
 func Frames(err error) []*runtime.Frames {
 	var fss []*runtime.Frames
-	for ; err != nil; err = stackFramesNext(err, &fss) {
-		err, ok := err.(interface { //nolint:errorlint // We want to compare the current error.
+	erriter.Iter(err, func(err error) {
+		errf, ok := err.(interface { //nolint:errorlint // We want to compare the current error.
 			RuntimeStackFrames() *runtime.Frames
 		})
 		if ok {
-			fs := err.RuntimeStackFrames()
+			fs := errf.RuntimeStackFrames()
 			fss = append(fss, fs)
 		}
-	}
+	})
 	return fss
-}
-
-func stackFramesNext(err error, pfss *[]*runtime.Frames) error {
-	switch err := err.(type) { //nolint:errorlint // We want to compare the current error.
-	case interface{ Unwrap() error }:
-		return err.Unwrap() //nolint:wrapcheck // We want to return the wrapped error.
-	case interface{ Unwrap() []error }:
-		for _, err := range err.Unwrap() {
-			fss := Frames(err)
-			*pfss = append(*pfss, fss...)
-		}
-	}
-	return nil
 }
 
 var errHas = errbase.New("stack")
