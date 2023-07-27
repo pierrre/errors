@@ -6,6 +6,7 @@ import (
 	"io"
 	"sync"
 
+	"github.com/pierrre/errors/erriter"
 	"github.com/pierrre/go-libs/bufpool"
 	"github.com/pierrre/go-libs/strconvio"
 )
@@ -65,16 +66,11 @@ func writeSub(w io.Writer, depth []int) {
 }
 
 func writeNext(w io.Writer, err error, depth []int) error {
-	switch err := err.(type) { //nolint: errorlint // We want to compare the current error.
-	case interface{ Unwrap() error }:
-		return err.Unwrap() //nolint:wrapcheck // We want to return the wrapped error.
-	case interface{ Unwrap() []error }:
-		errs := err.Unwrap()
+	return erriter.Unwrap(err, func(errs []error) { //nolint:wrapcheck // We want to return the wrapped error.
 		for i, err := range errs {
 			write(w, err, append(depth, i))
 		}
-	}
-	return nil
+	})
 }
 
 var bufferPool = bufpool.Pool{}
