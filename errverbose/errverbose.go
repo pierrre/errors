@@ -39,6 +39,10 @@ func Write(w io.Writer, err error) {
 
 func write(w io.Writer, err error, depth []int) {
 	writeSub(w, depth)
+	if err == nil {
+		_, _ = io.WriteString(w, "<nil>\n")
+		return
+	}
 	_, _ = io.WriteString(w, err.Error())
 	_, _ = io.WriteString(w, "\n")
 	for ; err != nil; err = writeNext(w, err, depth) {

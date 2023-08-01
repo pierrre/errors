@@ -84,7 +84,12 @@ func TestFormatter(t *testing.T) {
 	assert.Equal(t, s, "error\nverbose\n")
 }
 
-func TestVerboseJoin(t *testing.T) {
+func TestNil(t *testing.T) {
+	s := String(nil)
+	assert.Equal(t, s, "<nil>\n")
+}
+
+func TestJoin(t *testing.T) {
 	err := &testVerbose{
 		error: errors.Join(
 			&testVerbose{
