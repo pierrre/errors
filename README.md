@@ -36,6 +36,8 @@ The error [verbose message](#verbose-message) includes the stack trace.
 frames := errors.StackFrames(err)
 ```
 
+It's compatible with [Sentry](https://pkg.go.dev/github.com/getsentry/sentry-go).
+
 ## Verbose message
 
 The error verbose message shows additional information about the error.
