@@ -8,4 +8,4 @@ require (
 	github.com/pierrre/pretty v0.0.8
 )
 
-require github.com/pierrre/compare v1.2.1 // indirect
+require github.com/pierrre/compare v1.2.2 // indirect
