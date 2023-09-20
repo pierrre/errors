@@ -8,7 +8,7 @@ import (
 
 // Configure configures the integration.
 //
-// It sets errval.VerboseStringer with pretty.Config.String.
+// It sets errval.VerboseWriter with pretty.Config.String.
 func Configure(config *pretty.Config) {
 	errval.VerboseWriter = config.Write
 }
