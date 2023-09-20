@@ -84,3 +84,4 @@ See the provided packages as example:
 
 - Replace the import `errors` with `github.com/pierrre/errors`
 - Replace `fmt.Errorf("some wessage: %w", err)` with `errors.Wrap(err, "some message")`
+- Use `errbase.New()` for sentinel error
