@@ -10,7 +10,7 @@ import (
 //
 // It sets errval.VerboseStringer with pretty.Config.String.
 func Configure(config *pretty.Config) {
-	errval.VerboseStringer = config.String
+	errval.VerboseWriter = config.Write
 }
 
 // ConfigureDefault calls Configure() with pretty.DefaultConfig.

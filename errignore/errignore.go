@@ -2,6 +2,8 @@
 package errignore
 
 import (
+	"io"
+
 	"github.com/pierrre/errors"
 )
 
@@ -25,8 +27,8 @@ func (err *ignore) Unwrap() error {
 	return err.error
 }
 
-func (err *ignore) ErrorVerbose() string {
-	return "ignored"
+func (err *ignore) ErrorVerbose(w io.Writer) {
+	_, _ = io.WriteString(w, "ignored")
 }
 
 func (err *ignore) Ignored() bool {

@@ -2,6 +2,7 @@
 package errtag
 
 import (
+	"io"
 	"strconv"
 
 	"github.com/pierrre/errors/erriter"
@@ -53,8 +54,11 @@ func (err *tag) Unwrap() error {
 	return err.error
 }
 
-func (err *tag) ErrorVerbose() string {
-	return "tag " + err.key + " = " + err.val
+func (err *tag) ErrorVerbose(w io.Writer) {
+	_, _ = io.WriteString(w, "tag ")
+	_, _ = io.WriteString(w, err.key)
+	_, _ = io.WriteString(w, " = ")
+	_, _ = io.WriteString(w, err.val)
 }
 
 func (err *tag) Tag() (key string, val string) {
