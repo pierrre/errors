@@ -3,13 +3,13 @@ package errstack
 
 import (
 	std_errors "errors" // Prevent import cycle.
+	"io"
 	"path/filepath"
 	"runtime"
 	"sync"
 
 	"github.com/pierrre/errors/errbase"
 	"github.com/pierrre/errors/erriter"
-	"github.com/pierrre/go-libs/bufpool"
 	"github.com/pierrre/go-libs/strconvio"
 )
 
@@ -61,26 +61,21 @@ func (err *stack) Is(target error) bool {
 	return target == err || target == errHas
 }
 
-var bufferPool = bufpool.Pool{}
-
-func (err *stack) ErrorVerbose() string {
-	b := bufferPool.Get()
-	defer bufferPool.Put(b)
-	_, _ = b.WriteString("stack\n")
+func (err *stack) ErrorVerbose(w io.Writer) {
+	_, _ = io.WriteString(w, "stack\n")
 	fs := err.RuntimeStackFrames()
 	for more := true; more; {
 		var f runtime.Frame
 		f, more = fs.Next()
 		_, file := filepath.Split(f.File)
-		_, _ = b.WriteString("\t")
-		_, _ = b.WriteString(f.Function)
-		_, _ = b.WriteString(" ")
-		_, _ = b.WriteString(file)
-		_, _ = b.WriteString(":")
-		_, _ = strconvio.WriteInt(b, int64(f.Line), 10)
-		_, _ = b.WriteString("\n")
+		_, _ = io.WriteString(w, "\t")
+		_, _ = io.WriteString(w, f.Function)
+		_, _ = io.WriteString(w, " ")
+		_, _ = io.WriteString(w, file)
+		_, _ = io.WriteString(w, ":")
+		_, _ = strconvio.WriteInt(w, int64(f.Line), 10)
+		_, _ = io.WriteString(w, "\n")
 	}
-	return b.String()
 }
 
 // StackFrames returns the list of PCs associated to the error.

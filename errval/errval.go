@@ -3,15 +3,16 @@ package errval
 
 import (
 	"fmt"
+	"io"
 
 	"github.com/pierrre/errors/erriter"
 )
 
-// VerboseStringer returns the string representation of a value in a verbose message.
+// VerboseWriter writes the representation of a value in a verbose message.
 //
 // It can be changed in order to customize how values are formatted.
-var VerboseStringer = func(v any) string {
-	return fmt.Sprint(v)
+var VerboseWriter = func(w io.Writer, v any) {
+	_, _ = fmt.Fprint(w, v)
 }
 
 // Wrap adds a value to an error.
@@ -39,8 +40,11 @@ func (err *value) Unwrap() error {
 	return err.error
 }
 
-func (err *value) ErrorVerbose() string {
-	return "value " + err.key + " = " + VerboseStringer(err.val)
+func (err *value) ErrorVerbose(w io.Writer) {
+	_, _ = io.WriteString(w, "value ")
+	_, _ = io.WriteString(w, err.key)
+	_, _ = io.WriteString(w, " = ")
+	VerboseWriter(w, err.val)
 }
 
 func (err *value) Value() (key string, val any) {

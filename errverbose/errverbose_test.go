@@ -44,8 +44,8 @@ type testVerbose struct {
 	error
 }
 
-func (v *testVerbose) ErrorVerbose() string {
-	return "verbose"
+func (v *testVerbose) ErrorVerbose(w io.Writer) {
+	_, _ = io.WriteString(w, "verbose")
 }
 
 func (v *testVerbose) Unwrap() error {

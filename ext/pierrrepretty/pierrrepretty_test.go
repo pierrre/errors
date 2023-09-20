@@ -1,6 +1,7 @@
 package pierrrepretty
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/pierrre/assert"
@@ -18,6 +19,8 @@ func Test(t *testing.T) {
 	err = errval.Wrap(err, "foo", "bar")
 	var v errverbose.Interface
 	assert.ErrorAs(t, err, &v)
-	s := v.ErrorVerbose()
+	sb := new(strings.Builder)
+	v.ErrorVerbose(sb)
+	s := sb.String()
 	assert.Equal(t, s, "value foo = (string) (len=3) \"bar\"")
 }

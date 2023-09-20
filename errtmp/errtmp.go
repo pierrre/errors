@@ -2,9 +2,10 @@
 package errtmp
 
 import (
-	"strconv"
+	"io"
 
 	"github.com/pierrre/errors"
+	"github.com/pierrre/go-libs/strconvio"
 )
 
 // Wrap marks an errors as temporary.
@@ -29,8 +30,9 @@ func (err *temporary) Unwrap() error {
 	return err.error
 }
 
-func (err *temporary) ErrorVerbose() string {
-	return "temporary = " + strconv.FormatBool(err.tmp)
+func (err *temporary) ErrorVerbose(w io.Writer) {
+	_, _ = io.WriteString(w, "temporary = ")
+	_, _ = strconvio.WriteBool(w, err.tmp)
 }
 
 func (err *temporary) Temporary() bool {

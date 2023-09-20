@@ -15,9 +15,9 @@ import (
 //
 // It is used by Write().
 type Interface interface {
-	// ErrorVerbose returns the error verbose message.
-	// It must only return the verbose message of the error, not the error chain.
-	ErrorVerbose() string
+	// ErrorVerbose writes the error verbose message.
+	// It must only write the verbose message of the error, not the error chain.
+	ErrorVerbose(io.Writer)
 }
 
 var depthPool = sync.Pool{
@@ -48,8 +48,7 @@ func write(w io.Writer, err error, depth []int) {
 	for ; err != nil; err = writeNext(w, err, depth) {
 		v, ok := err.(Interface) //nolint:errorlint // We want to compare the current error.
 		if ok {
-			s := v.ErrorVerbose()
-			_, _ = io.WriteString(w, s)
+			v.ErrorVerbose(w)
 			_, _ = io.WriteString(w, "\n")
 		}
 	}

@@ -97,7 +97,7 @@ func TestVerboseAllocs(t *testing.T) {
 	err := newTestError()
 	assert.AllocsPerRun(t, 100, func() {
 		errverbose.Write(io.Discard, err)
-	}, 7)
+	}, 2)
 }
 
 func TestStackAllocs(t *testing.T) {

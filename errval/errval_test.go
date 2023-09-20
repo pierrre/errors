@@ -2,7 +2,9 @@ package errval_test
 
 import (
 	"fmt"
+	"io"
 	"runtime"
+	"strings"
 	"testing"
 
 	"github.com/pierrre/assert"
@@ -66,7 +68,9 @@ func TestVerbose(t *testing.T) {
 	err = Wrap(err, "foo", "bar")
 	var v errverbose.Interface
 	assert.ErrorAs(t, err, &v)
-	s := v.ErrorVerbose()
+	sb := new(strings.Builder)
+	v.ErrorVerbose(sb)
+	s := sb.String()
 	assert.Equal(t, s, "value foo = bar")
 }
 
@@ -118,11 +122,9 @@ func TestVerboseAllocs(t *testing.T) {
 	err = Wrap(err, "foo", "bar")
 	var v errverbose.Interface
 	assert.ErrorAs(t, err, &v)
-	var res string
 	assert.AllocsPerRun(t, 100, func() {
-		res = v.ErrorVerbose()
-	}, 2)
-	runtime.KeepAlive(res)
+		v.ErrorVerbose(io.Discard)
+	}, 0)
 }
 
 func BenchmarkWrap(b *testing.B) {
@@ -149,9 +151,7 @@ func BenchmarkVerbose(b *testing.B) {
 	err = Wrap(err, "foo", "bar")
 	var v errverbose.Interface
 	assert.ErrorAs(b, err, &v)
-	var res string
 	for i := 0; i < b.N; i++ {
-		res = v.ErrorVerbose()
+		v.ErrorVerbose(io.Discard)
 	}
-	runtime.KeepAlive(res)
 }
