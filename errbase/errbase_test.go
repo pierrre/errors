@@ -7,12 +7,7 @@ import (
 
 	"github.com/pierrre/assert"
 	. "github.com/pierrre/errors/errbase"
-	"github.com/pierrre/errors/internal/errtest"
 )
-
-func init() {
-	errtest.Configure()
-}
 
 func Example() {
 	err := New("error")

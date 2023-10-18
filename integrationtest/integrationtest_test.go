@@ -13,12 +13,7 @@ import (
 	"github.com/pierrre/errors/errtmp"
 	"github.com/pierrre/errors/errval"
 	"github.com/pierrre/errors/errverbose"
-	"github.com/pierrre/errors/internal/errtest"
 )
-
-func init() {
-	errtest.Configure()
-}
 
 func newTestError() error {
 	err := errors.Join(

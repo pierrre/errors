@@ -10,12 +10,7 @@ import (
 	"github.com/pierrre/errors"
 	"github.com/pierrre/errors/errbase"
 	. "github.com/pierrre/errors/errverbose"
-	"github.com/pierrre/errors/internal/errtest"
 )
-
-func init() {
-	errtest.Configure()
-}
 
 func ExampleWrite() {
 	err := errbase.New("error")
