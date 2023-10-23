@@ -17,7 +17,7 @@ import (
 type Interface interface {
 	// ErrorVerbose writes the error verbose message.
 	// It must only write the verbose message of the error, not the error chain.
-	ErrorVerbose(io.Writer)
+	ErrorVerbose(w io.Writer)
 }
 
 var depthPool = sync.Pool{
