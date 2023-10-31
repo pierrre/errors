@@ -13,7 +13,7 @@ import (
 // It can be changed in order to customize how values are formatted.
 //
 // By default it uses [pretty.Write].
-var VerboseWriter = pretty.Write
+var VerboseWriter func(io.Writer, any) = pretty.Write
 
 // Wrap adds a value to an error.
 //
