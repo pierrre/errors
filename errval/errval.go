@@ -2,18 +2,18 @@
 package errval
 
 import (
-	"fmt"
 	"io"
 
 	"github.com/pierrre/errors/erriter"
+	"github.com/pierrre/pretty"
 )
 
 // VerboseWriter writes the representation of a value in a verbose message.
 //
 // It can be changed in order to customize how values are formatted.
-var VerboseWriter = func(w io.Writer, v any) {
-	_, _ = fmt.Fprint(w, v)
-}
+//
+// By default it uses [pretty.Write].
+var VerboseWriter = pretty.Write
 
 // Wrap adds a value to an error.
 //

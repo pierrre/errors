@@ -66,7 +66,7 @@ func TestVerbose(t *testing.T) {
 	sb := new(strings.Builder)
 	v.ErrorVerbose(sb)
 	s := sb.String()
-	assert.Equal(t, s, "value foo = bar")
+	assert.Equal(t, s, `value foo = (string) (len=3) "bar"`)
 }
 
 func TestJoin(t *testing.T) {
