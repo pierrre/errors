@@ -24,22 +24,22 @@ func Wrap(err error, key string, val string) error {
 	}
 }
 
-// WrapInt is a helper for Wrap with int value.
+// WrapInt is a helper for [Wrap] with int value.
 func WrapInt(err error, key string, value int) error {
 	return Wrap(err, key, strconv.Itoa(value))
 }
 
-// WrapInt64 is a helper for Wrap with int64 value.
+// WrapInt64 is a helper for [Wrap] with int64 value.
 func WrapInt64(err error, key string, value int64) error {
 	return Wrap(err, key, strconv.FormatInt(value, 10))
 }
 
-// WrapFloat64 is a helper for Wrap with float64 value.
+// WrapFloat64 is a helper for [Wrap] with float64 value.
 func WrapFloat64(err error, key string, value float64) error {
 	return Wrap(err, key, strconv.FormatFloat(value, 'g', -1, 64))
 }
 
-// WrapBool is a helper for Wrap with bool value.
+// WrapBool is a helper for [Wrap] with bool value.
 func WrapBool(err error, key string, value bool) error {
 	return Wrap(err, key, strconv.FormatBool(value))
 }

@@ -23,9 +23,7 @@ func Wrap(err error, msg string) error {
 	}
 }
 
-// Wrapf adds a formatted message to an error.
-//
-// See Wrap.
+// Wrapf calls [Wrap] with a formatted message.
 //
 // It doesn't support the %w verb.
 func Wrapf(err error, format string, args ...any) error {

@@ -43,30 +43,22 @@ func Wrapf(err error, format string, args ...any) error {
 	return err
 }
 
-// As calls std_errors.As.
-//
-// See https://pkg.go.dev/errors#As .
+// As is a wrapper for [std_errors.As].
 func As(err error, target any) bool {
 	return std_errors.As(err, target)
 }
 
-// Is calls std_errors.Is.
-//
-// See https://pkg.go.dev/errors#Is .
+// Is is a wrapper for [std_errors.Is].
 func Is(err, target error) bool {
 	return std_errors.Is(err, target)
 }
 
-// Join calls std_errors.Join.
-//
-// See https://pkg.go.dev/errors#Join .
+// Join is a wrapper for [std_errors.Join].
 func Join(errs ...error) error {
 	return std_errors.Join(errs...)
 }
 
-// Unwrap calls std_errors.Unwrap.
-//
-// See https://pkg.go.dev/errors#Unwrap .
+// Unwrap is a wrapper for [std_errors.Unwrap].
 func Unwrap(err error) error {
 	return std_errors.Unwrap(err)
 }

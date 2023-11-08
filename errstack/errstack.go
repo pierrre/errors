@@ -17,14 +17,12 @@ import (
 //
 // The verbose message contains the stack.
 //
-// See https://pkg.go.dev/runtime#Frames .
+// See [runtime.Frames].
 func Wrap(err error) error {
 	return WrapSkip(err, 1)
 }
 
-// WrapSkip adds a stack to an error, skipping the given number of frames.
-//
-// See Wrap().
+// WrapSkip calls [Wrap], skipping the given number of frames.
 func WrapSkip(err error, skip int) error {
 	if err == nil {
 		return nil
@@ -87,7 +85,7 @@ func (err *stack) StackFrames() []uintptr {
 	return err.callers
 }
 
-// RuntimeStackFrames returns the runtime.Frames associated to the error.
+// RuntimeStackFrames returns the [runtime.Frames] associated to the error.
 //
 // It should be named StackFrames, but it was not possible because of the compatibility with the Sentry library.
 //
@@ -96,9 +94,7 @@ func (err *stack) RuntimeStackFrames() *runtime.Frames {
 	return runtime.CallersFrames(err.callers)
 }
 
-// Frames returns the list of runtime.Frames associated to an error.
-//
-// See https://pkg.go.dev/runtime#Frames .
+// Frames returns the list of [runtime.Frames] associated to an error.
 func Frames(err error) []*runtime.Frames {
 	var fss []*runtime.Frames
 	erriter.Iter(err, func(err error) {

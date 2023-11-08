@@ -13,7 +13,7 @@ import (
 
 // Interface is an error that provides verbose information.
 //
-// It is used by Write().
+// It is used by [Write].
 type Interface interface {
 	// ErrorVerbose writes the error verbose message.
 	// It must only write the verbose message of the error, not the error chain.
@@ -86,7 +86,7 @@ func String(err error) string {
 	return b.String()
 }
 
-// Formatter returns a fmt.Formatter that writes the error's verbose message.
+// Formatter returns a [fmt.Formatter] that writes the error's verbose message.
 func Formatter(err error) fmt.Formatter {
 	return &formatter{
 		error: err,

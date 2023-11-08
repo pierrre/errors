@@ -18,7 +18,7 @@ var VerboseWriter func(io.Writer, any) = pretty.Write
 // Wrap adds a value to an error.
 //
 // The verbose message is "value <key> = <val>".
-// The value is written using the VerboseWriter function.
+// The value is written using the [VerboseWriter] function.
 func Wrap(err error, key string, val any) error {
 	if err == nil {
 		return nil
