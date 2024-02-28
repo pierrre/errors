@@ -75,7 +75,7 @@ func TestNewAllocs(t *testing.T) {
 	var res error
 	assert.AllocsPerRun(t, 100, func() {
 		res = newTestError()
-	}, 17)
+	}, 16)
 	runtime.KeepAlive(res)
 }
 
