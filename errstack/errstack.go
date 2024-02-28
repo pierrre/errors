@@ -98,7 +98,7 @@ func (err *stack) RuntimeStackFrames() *runtime.Frames {
 func Frames(err error) []*runtime.Frames {
 	var fss []*runtime.Frames
 	erriter.Iter(err, func(err error) {
-		errf, ok := err.(interface { //nolint:errorlint // We want to compare the current error.
+		errf, ok := err.(interface {
 			RuntimeStackFrames() *runtime.Frames
 		})
 		if ok {

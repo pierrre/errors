@@ -69,7 +69,7 @@ func (err *tag) Tag() (key string, val string) {
 func Get(err error) map[string]string {
 	tags := make(map[string]string)
 	erriter.Iter(err, func(err error) {
-		errt, ok := err.(interface { //nolint:errorlint // We want to compare the current error.
+		errt, ok := err.(interface {
 			Tag() (key string, val string)
 		})
 		if !ok {

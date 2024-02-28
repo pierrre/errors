@@ -46,7 +46,7 @@ func write(w io.Writer, err error, depth []int) {
 	_, _ = io.WriteString(w, err.Error())
 	_, _ = io.WriteString(w, "\n")
 	for ; err != nil; err = writeNext(w, err, depth) {
-		v, ok := err.(Interface) //nolint:errorlint // We want to compare the current error.
+		v, ok := err.(Interface)
 		if ok {
 			v.ErrorVerbose(w)
 			_, _ = io.WriteString(w, "\n")
