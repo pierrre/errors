@@ -24,7 +24,7 @@ func TestIter(t *testing.T) {
 		count++
 		assert.Error(t, err)
 	})
-	assert.Equal(t, count, 4)
+	assert.Equal(t, count, 5)
 }
 
 func TestIterAllocs(t *testing.T) {

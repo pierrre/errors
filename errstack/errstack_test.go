@@ -82,7 +82,7 @@ func TestJoin(t *testing.T) {
 		),
 	)
 	sfs := Frames(err)
-	assert.SliceLen(t, sfs, 3)
+	assert.SliceLen(t, sfs, 4)
 }
 
 func TestWrapAllocs(t *testing.T) {
