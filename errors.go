@@ -53,9 +53,13 @@ func Is(err, target error) bool {
 	return std_errors.Is(err, target)
 }
 
-// Join is a wrapper for [std_errors.Join].
+// Join calls [std_errors.Join] and adds a stack.
+//
+// See https://pkg.go.dev/errors#Join .
 func Join(errs ...error) error {
-	return std_errors.Join(errs...)
+	err := std_errors.Join(errs...)
+	err = errstack.WrapSkip(err, 1)
+	return err //nolint:wrapcheck // The error is wrapped.
 }
 
 // Unwrap is a wrapper for [std_errors.Unwrap].

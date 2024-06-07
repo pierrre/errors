@@ -73,6 +73,7 @@ func TestIs(t *testing.T) {
 
 func TestJoin(t *testing.T) {
 	err := Join(New("error 1"), New("error 2"))
+	err = Unwrap(err) // Remove the stack.
 	errUnwrap, _ := assert.Type[interface {
 		Unwrap() []error
 	}](t, err)

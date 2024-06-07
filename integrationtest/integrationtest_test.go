@@ -36,13 +36,13 @@ func TestError(t *testing.T) {
 func TestVerbose(t *testing.T) {
 	err := newTestError()
 	s := errverbose.String(err)
-	assert.RegexpMatch(t, `^test: error a\nerror b\nvalue c = \(string\) \(len=1\) "d"\ntag a = b\ntemporary = true\nignored\n\nSub error 0: error a\nstack\n(\t.+ .+:\d+\n)+\n\nSub error 1: error b\nstack\n(\t.+ .+:\d+\n)+\n$`, s)
+	assert.RegexpMatch(t, `^test: error a\nerror b\nvalue c = \(string\) \(len=1\) "d"\ntag a = b\ntemporary = true\nignored\nstack\n(\t.+ .+:\d+\n)+\n\nSub error 0: error a\nstack\n(\t.+ .+:\d+\n)+\n\nSub error 1: error b\nstack\n(\t.+ .+:\d+\n)+\n$`, s)
 }
 
 func TestStack(t *testing.T) {
 	err := newTestError()
 	sfs := errstack.Frames(err)
-	assert.SliceLen(t, sfs, 2)
+	assert.SliceLen(t, sfs, 3)
 	for _, sf := range sfs {
 		f, _ := sf.Next()
 		assert.Equal(t, f.Function, "github.com/pierrre/errors/integrationtest.newTestError")
@@ -75,7 +75,7 @@ func TestNewAllocs(t *testing.T) {
 	var res error
 	assert.AllocsPerRun(t, 100, func() {
 		res = newTestError()
-	}, 16)
+	}, 18)
 	runtime.KeepAlive(res)
 }
 
@@ -92,7 +92,7 @@ func TestVerboseAllocs(t *testing.T) {
 	err := newTestError()
 	assert.AllocsPerRun(t, 100, func() {
 		errverbose.Write(io.Discard, err)
-	}, 2)
+	}, 3)
 }
 
 func TestStackAllocs(t *testing.T) {
@@ -100,7 +100,7 @@ func TestStackAllocs(t *testing.T) {
 	var res []*runtime.Frames
 	assert.AllocsPerRun(t, 100, func() {
 		errstack.Frames(err)
-	}, 4)
+	}, 6)
 	runtime.KeepAlive(res)
 }
 
