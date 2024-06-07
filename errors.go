@@ -54,8 +54,6 @@ func Is(err, target error) bool {
 }
 
 // Join calls [std_errors.Join] and adds a stack.
-//
-// See https://pkg.go.dev/errors#Join .
 func Join(errs ...error) error {
 	err := std_errors.Join(errs...)
 	err = errstack.WrapSkip(err, 1)
