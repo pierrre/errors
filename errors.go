@@ -11,6 +11,9 @@ import (
 	"github.com/pierrre/errors/errstack"
 )
 
+// ErrUnsupported is an alias for [std_errors.ErrUnsupported].
+var ErrUnsupported = std_errors.ErrUnsupported
+
 // New returns a new error with a message and a stack.
 func New(msg string) error {
 	err := errbase.New(msg)
