@@ -98,7 +98,7 @@ func BenchmarkWrite(b *testing.B) {
 	err = &testVerbose{
 		error: err,
 	}
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		Write(io.Discard, err)
 	}
 }

@@ -197,7 +197,7 @@ func TestVerboseAllocs(t *testing.T) {
 func BenchmarkWrap(b *testing.B) {
 	err := errbase.New("error")
 	var res error
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		res = Wrap(err, "foo", "bar")
 	}
 	runtime.KeepAlive(res)
@@ -206,7 +206,7 @@ func BenchmarkWrap(b *testing.B) {
 func BenchmarkWrapInt(b *testing.B) {
 	err := errbase.New("error")
 	var res error
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		res = WrapInt(err, "foo", 123)
 	}
 	runtime.KeepAlive(res)
@@ -215,7 +215,7 @@ func BenchmarkWrapInt(b *testing.B) {
 func BenchmarkWrapInt64(b *testing.B) {
 	err := errbase.New("error")
 	var res error
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		res = WrapInt64(err, "foo", 123)
 	}
 	runtime.KeepAlive(res)
@@ -224,7 +224,7 @@ func BenchmarkWrapInt64(b *testing.B) {
 func BenchmarkWrapFloat64(b *testing.B) {
 	err := errbase.New("error")
 	var res error
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		res = WrapFloat64(err, "foo", 12.3)
 	}
 	runtime.KeepAlive(res)
@@ -233,7 +233,7 @@ func BenchmarkWrapFloat64(b *testing.B) {
 func BenchmarkWrapBool(b *testing.B) {
 	err := errbase.New("error")
 	var res error
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		res = WrapBool(err, "foo", true)
 	}
 	runtime.KeepAlive(res)
@@ -243,7 +243,7 @@ func BenchmarkGet(b *testing.B) {
 	err := errbase.New("error")
 	err = Wrap(err, "foo", "bar")
 	var res map[string]string
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		res = Get(err)
 	}
 	runtime.KeepAlive(res)
@@ -254,7 +254,7 @@ func BenchmarkVerbose(b *testing.B) {
 	err = Wrap(err, "foo", "bar")
 	var v errverbose.Interface
 	assert.ErrorAs(b, err, &v)
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		v.ErrorVerbose(io.Discard)
 	}
 }

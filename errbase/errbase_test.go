@@ -48,7 +48,7 @@ func TestErrorAllocs(t *testing.T) {
 
 func BenchmarkNew(b *testing.B) {
 	var res error
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		res = New("error")
 	}
 	runtime.KeepAlive(res)
@@ -56,7 +56,7 @@ func BenchmarkNew(b *testing.B) {
 
 func BenchmarkNewf(b *testing.B) {
 	var res error
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		res = Newf("error %d", 1)
 	}
 	runtime.KeepAlive(res)
@@ -65,7 +65,7 @@ func BenchmarkNewf(b *testing.B) {
 func BenchmarkError(b *testing.B) {
 	err := New("error")
 	var res string
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		res = err.Error()
 	}
 	runtime.KeepAlive(res)

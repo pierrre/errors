@@ -142,7 +142,7 @@ func TestValueAllocs(t *testing.T) {
 
 func BenchmarkNew(b *testing.B) {
 	var res error
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		res = newTestError()
 	}
 	runtime.KeepAlive(res)
@@ -151,7 +151,7 @@ func BenchmarkNew(b *testing.B) {
 func BenchmarkError(b *testing.B) {
 	err := newTestError()
 	var res string
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		res = err.Error()
 	}
 	runtime.KeepAlive(res)
@@ -159,7 +159,7 @@ func BenchmarkError(b *testing.B) {
 
 func BenchmarkVerbose(b *testing.B) {
 	err := newTestError()
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		errverbose.Write(io.Discard, err)
 	}
 }
@@ -167,7 +167,7 @@ func BenchmarkVerbose(b *testing.B) {
 func BenchmarkStack(b *testing.B) {
 	err := newTestError()
 	var res []*runtime.Frames
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		res = errstack.Frames(err)
 	}
 	runtime.KeepAlive(res)
@@ -176,7 +176,7 @@ func BenchmarkStack(b *testing.B) {
 func BenchmarkIgnore(b *testing.B) {
 	err := newTestError()
 	var res bool
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		res = errignore.Is(err)
 	}
 	runtime.KeepAlive(res)
@@ -185,7 +185,7 @@ func BenchmarkIgnore(b *testing.B) {
 func BenchmarkTemporary(b *testing.B) {
 	err := newTestError()
 	var res bool
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		res = errtmp.Is(err)
 	}
 	runtime.KeepAlive(res)
@@ -194,7 +194,7 @@ func BenchmarkTemporary(b *testing.B) {
 func BenchmarkTag(b *testing.B) {
 	err := newTestError()
 	var res map[string]string
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		res = errtag.Get(err)
 	}
 	runtime.KeepAlive(res)
@@ -203,7 +203,7 @@ func BenchmarkTag(b *testing.B) {
 func BenchmarkValue(b *testing.B) {
 	err := newTestError()
 	var res map[string]any
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		res = errval.Get(err)
 	}
 	runtime.KeepAlive(res)

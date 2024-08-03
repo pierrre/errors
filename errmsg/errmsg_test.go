@@ -73,7 +73,7 @@ func TestErrorAllocs(t *testing.T) {
 func BenchmarkWrap(b *testing.B) {
 	err := errbase.New("error")
 	var res error
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		res = Wrap(err, "test")
 	}
 	runtime.KeepAlive(res)
@@ -82,7 +82,7 @@ func BenchmarkWrap(b *testing.B) {
 func BenchmarkWrapf(b *testing.B) {
 	err := errbase.New("error")
 	var res error
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		res = Wrapf(err, "test %d", 1)
 	}
 	runtime.KeepAlive(res)
@@ -92,7 +92,7 @@ func BenchmarkError(b *testing.B) {
 	err := errbase.New("error")
 	err = Wrap(err, "test")
 	var res string
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		res = err.Error()
 	}
 	runtime.KeepAlive(res)

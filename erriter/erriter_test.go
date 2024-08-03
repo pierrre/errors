@@ -36,7 +36,7 @@ func TestIterAllocs(t *testing.T) {
 
 func BenchmarkIter(b *testing.B) {
 	err := newtestError()
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		erriter.Iter(err, func(err error) {})
 	}
 }

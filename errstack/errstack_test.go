@@ -127,7 +127,7 @@ func TestVerboseAllocs(t *testing.T) {
 func BenchmarkWrap(b *testing.B) {
 	err := errbase.New("error")
 	var res error
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		res = Wrap(err)
 	}
 	runtime.KeepAlive(res)
@@ -137,7 +137,7 @@ func BenchmarkEnsure(b *testing.B) {
 	err := errbase.New("error")
 	err = Ensure(err)
 	var res error
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		res = Ensure(err)
 	}
 	runtime.KeepAlive(res)
@@ -147,7 +147,7 @@ func BenchmarkFrames(b *testing.B) {
 	err := errbase.New("error")
 	err = Wrap(err)
 	var res []*runtime.Frames
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		res = Frames(err)
 	}
 	runtime.KeepAlive(res)
@@ -158,7 +158,7 @@ func BenchmarkVerbose(b *testing.B) {
 	err = Wrap(err)
 	var v errverbose.Interface
 	assert.ErrorAs(b, err, &v)
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		v.ErrorVerbose(io.Discard)
 	}
 }
