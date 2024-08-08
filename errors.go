@@ -15,6 +15,9 @@ import (
 var ErrUnsupported = std_errors.ErrUnsupported
 
 // New returns a new error with a message and a stack.
+//
+// Warning: don't use this function to create a "sentinel" error, because it contains the stack of the (main) goroutine creating it.
+// Use [errbase.New] instead.
 func New(msg string) error {
 	err := errbase.New(msg)
 	err = errstack.WrapSkip(err, 1)
