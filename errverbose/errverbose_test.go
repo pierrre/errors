@@ -1,6 +1,7 @@
 package errverbose_test
 
 import (
+	std_errors "errors"
 	"fmt"
 	"io"
 	"strings"
@@ -81,6 +82,61 @@ func TestFormatter(t *testing.T) {
 func TestNil(t *testing.T) {
 	s := String(nil)
 	assert.Equal(t, s, "<nil>\n")
+}
+
+func TestJoin(t *testing.T) {
+	err := &testVerbose{
+		error: std_errors.Join(
+			&testVerbose{
+				error: std_errors.Join(
+					&testVerbose{
+						error: errbase.New("error a"),
+					},
+					&testVerbose{
+						error: errbase.New("error b"),
+					},
+				),
+			},
+			&testVerbose{
+				error: std_errors.Join(
+					&testVerbose{
+						error: errbase.New("error c"),
+					},
+					&testVerbose{
+						error: errbase.New("error d"),
+					},
+				),
+			},
+		),
+	}
+	s := String(err)
+	expected := `error a
+error b
+error c
+error d
+verbose
+
+Sub error 0: error a
+error b
+verbose
+
+Sub error 0.0: error a
+verbose
+
+Sub error 0.1: error b
+verbose
+
+Sub error 1: error c
+error d
+verbose
+
+Sub error 1.0: error c
+verbose
+
+Sub error 1.1: error d
+verbose
+`
+	assert.Equal(t, s, expected)
 }
 
 func TestWriteAllocs(t *testing.T) {
