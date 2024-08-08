@@ -49,12 +49,12 @@ func Wrapf(err error, format string, args ...any) error {
 	return err
 }
 
-// As is a wrapper for [std_errors.As].
+// As is an alias for [std_errors.As].
 func As(err error, target any) bool {
 	return std_errors.As(err, target)
 }
 
-// Is is a wrapper for [std_errors.Is].
+// Is is an alias for [std_errors.Is].
 func Is(err, target error) bool {
 	return std_errors.Is(err, target)
 }
@@ -66,7 +66,7 @@ func Join(errs ...error) error {
 	return err //nolint:wrapcheck // The error is wrapped.
 }
 
-// Unwrap is a wrapper for [std_errors.Unwrap].
+// Unwrap is an alias for [std_errors.Unwrap].
 func Unwrap(err error) error {
 	return std_errors.Unwrap(err)
 }
