@@ -69,11 +69,11 @@ func writeSub(w io.Writer, depth []int) {
 }
 
 func writeNext(w io.Writer, err error, depth []int) error {
-	return erriter.Unwrap(err, func(errs []error) { //nolint:wrapcheck // We want to return the wrapped error.
-		for i, err := range errs {
-			write(w, err, append(depth, i))
-		}
-	})
+	errs, err := erriter.Unwrap(err)
+	for i, e := range errs {
+		write(w, e, append(depth, i))
+	}
+	return err //nolint:wrapcheck // We want to return the wrapped error.
 }
 
 var bufferPool = bufpool.Pool{}
