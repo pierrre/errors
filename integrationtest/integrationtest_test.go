@@ -36,7 +36,7 @@ func TestError(t *testing.T) {
 func TestVerbose(t *testing.T) {
 	err := newTestError()
 	s := errverbose.String(err)
-	assert.RegexpMatch(t, `^test: error a\nerror b\nvalue c = \(string\) \(len=1\) "d"\ntag a = b\ntemporary = true\nignored\nstack\n(\t.+ .+:\d+\n)+\n\nSub error 0: error a\nstack\n(\t.+ .+:\d+\n)+\n\nSub error 1: error b\nstack\n(\t.+ .+:\d+\n)+\n$`, s)
+	assert.RegexpMatch(t, `^test: error a\nerror b\nvalue c = \[string\] \(len=1\) "d"\ntag a = b\ntemporary = true\nignored\nstack\n(\t.+ .+:\d+\n)+\n\nSub error 0: error a\nstack\n(\t.+ .+:\d+\n)+\n\nSub error 1: error b\nstack\n(\t.+ .+:\d+\n)+\n$`, s)
 }
 
 func TestStack(t *testing.T) {
