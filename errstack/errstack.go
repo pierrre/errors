@@ -6,11 +6,11 @@ import (
 	"io"
 	"path/filepath"
 	"runtime"
-	"sync"
 
 	"github.com/pierrre/errors/errbase"
 	"github.com/pierrre/errors/erriter"
 	"github.com/pierrre/go-libs/strconvio"
+	"github.com/pierrre/go-libs/syncutil"
 )
 
 // Wrap adds a stack to an error.
@@ -117,16 +117,17 @@ func has(err error) bool {
 
 const callersMaxLength = 1 << 16
 
-var callersPool = sync.Pool{
-	New: func() any {
-		return make([]uintptr, callersMaxLength)
+var callersPool = syncutil.PoolFor[[]uintptr]{
+	New: func() *[]uintptr {
+		v := make([]uintptr, callersMaxLength)
+		return &v
 	},
 }
 
 func callers(skip int) []uintptr {
-	pcItf := callersPool.Get()
-	defer callersPool.Put(pcItf)
-	pc := pcItf.([]uintptr) //nolint:forcetypeassert // The pool only contains []uintptr.
+	pcp := callersPool.Get()
+	defer callersPool.Put(pcp)
+	pc := *pcp
 	n := runtime.Callers(skip+2, pc)
 	pcRes := make([]uintptr, n)
 	copy(pcRes, pc)
