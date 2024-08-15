@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"github.com/pierrre/errors"
+	"github.com/pierrre/go-libs/unsafeio"
 )
 
 // Wrap marks an error as ignored.
@@ -28,7 +29,7 @@ func (err *ignore) Unwrap() error {
 }
 
 func (err *ignore) ErrorVerbose(w io.Writer) {
-	_, _ = io.WriteString(w, "ignored")
+	_, _ = unsafeio.WriteString(w, "ignored")
 }
 
 func (err *ignore) Ignored() bool {

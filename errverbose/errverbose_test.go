@@ -10,6 +10,7 @@ import (
 	"github.com/pierrre/assert"
 	"github.com/pierrre/errors/errbase"
 	. "github.com/pierrre/errors/errverbose"
+	"github.com/pierrre/go-libs/unsafeio"
 )
 
 func ExampleWrite() {
@@ -40,7 +41,7 @@ type testVerbose struct {
 }
 
 func (v *testVerbose) ErrorVerbose(w io.Writer) {
-	_, _ = io.WriteString(w, "verbose")
+	_, _ = unsafeio.WriteString(w, "verbose")
 }
 
 func (v *testVerbose) Unwrap() error {

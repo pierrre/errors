@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/pierrre/errors/erriter"
+	"github.com/pierrre/go-libs/unsafeio"
 )
 
 // Wrap adds a tag to an error.
@@ -55,10 +56,10 @@ func (err *tag) Unwrap() error {
 }
 
 func (err *tag) ErrorVerbose(w io.Writer) {
-	_, _ = io.WriteString(w, "tag ")
-	_, _ = io.WriteString(w, err.key)
-	_, _ = io.WriteString(w, " = ")
-	_, _ = io.WriteString(w, err.val)
+	_, _ = unsafeio.WriteString(w, "tag ")
+	_, _ = unsafeio.WriteString(w, err.key)
+	_, _ = unsafeio.WriteString(w, " = ")
+	_, _ = unsafeio.WriteString(w, err.val)
 }
 
 func (err *tag) Tag() (key string, val string) {

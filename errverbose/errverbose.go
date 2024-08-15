@@ -9,6 +9,7 @@ import (
 	"github.com/pierrre/go-libs/bufpool"
 	"github.com/pierrre/go-libs/strconvio"
 	"github.com/pierrre/go-libs/syncutil"
+	"github.com/pierrre/go-libs/unsafeio"
 )
 
 // Interface is an error that provides verbose information.
@@ -41,16 +42,16 @@ func Write(w io.Writer, err error) {
 func write(w io.Writer, err error, depth []int) {
 	writeSub(w, depth)
 	if err == nil {
-		_, _ = io.WriteString(w, "<nil>\n")
+		_, _ = unsafeio.WriteString(w, "<nil>\n")
 		return
 	}
-	_, _ = io.WriteString(w, err.Error())
-	_, _ = io.WriteString(w, "\n")
+	_, _ = unsafeio.WriteString(w, err.Error())
+	_, _ = unsafeio.WriteString(w, "\n")
 	for ; err != nil; err = writeNext(w, err, depth) {
 		v, ok := err.(Interface)
 		if ok {
 			v.ErrorVerbose(w)
-			_, _ = io.WriteString(w, "\n")
+			_, _ = unsafeio.WriteString(w, "\n")
 		}
 	}
 }
@@ -59,14 +60,14 @@ func writeSub(w io.Writer, depth []int) {
 	if len(depth) == 0 {
 		return
 	}
-	_, _ = io.WriteString(w, "\nSub error ")
+	_, _ = unsafeio.WriteString(w, "\nSub error ")
 	for i, d := range depth {
 		if i > 0 {
-			_, _ = io.WriteString(w, ".")
+			_, _ = unsafeio.WriteString(w, ".")
 		}
 		_, _ = strconvio.WriteInt(w, int64(d), 10)
 	}
-	_, _ = io.WriteString(w, ": ")
+	_, _ = unsafeio.WriteString(w, ": ")
 }
 
 func writeNext(w io.Writer, err error, depth []int) error {

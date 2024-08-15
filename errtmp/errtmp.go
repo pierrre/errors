@@ -6,6 +6,7 @@ import (
 
 	"github.com/pierrre/errors"
 	"github.com/pierrre/go-libs/strconvio"
+	"github.com/pierrre/go-libs/unsafeio"
 )
 
 // Wrap marks an errors as temporary.
@@ -31,7 +32,7 @@ func (err *temporary) Unwrap() error {
 }
 
 func (err *temporary) ErrorVerbose(w io.Writer) {
-	_, _ = io.WriteString(w, "temporary = ")
+	_, _ = unsafeio.WriteString(w, "temporary = ")
 	_, _ = strconvio.WriteBool(w, err.tmp)
 }
 

@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"github.com/pierrre/errors/erriter"
+	"github.com/pierrre/go-libs/unsafeio"
 	"github.com/pierrre/pretty"
 )
 
@@ -41,9 +42,9 @@ func (err *value) Unwrap() error {
 }
 
 func (err *value) ErrorVerbose(w io.Writer) {
-	_, _ = io.WriteString(w, "value ")
-	_, _ = io.WriteString(w, err.key)
-	_, _ = io.WriteString(w, " = ")
+	_, _ = unsafeio.WriteString(w, "value ")
+	_, _ = unsafeio.WriteString(w, err.key)
+	_, _ = unsafeio.WriteString(w, " = ")
 	VerboseWriter(w, err.val)
 }
 

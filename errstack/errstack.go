@@ -11,6 +11,7 @@ import (
 	"github.com/pierrre/errors/erriter"
 	"github.com/pierrre/go-libs/strconvio"
 	"github.com/pierrre/go-libs/syncutil"
+	"github.com/pierrre/go-libs/unsafeio"
 )
 
 // Wrap adds a stack to an error.
@@ -60,19 +61,19 @@ func (err *stack) Is(target error) bool {
 }
 
 func (err *stack) ErrorVerbose(w io.Writer) {
-	_, _ = io.WriteString(w, "stack\n")
+	_, _ = unsafeio.WriteString(w, "stack\n")
 	fs := err.RuntimeStackFrames()
 	for more := true; more; {
 		var f runtime.Frame
 		f, more = fs.Next()
 		_, file := filepath.Split(f.File)
-		_, _ = io.WriteString(w, "\t")
-		_, _ = io.WriteString(w, f.Function)
-		_, _ = io.WriteString(w, " ")
-		_, _ = io.WriteString(w, file)
-		_, _ = io.WriteString(w, ":")
+		_, _ = unsafeio.WriteString(w, "\t")
+		_, _ = unsafeio.WriteString(w, f.Function)
+		_, _ = unsafeio.WriteString(w, " ")
+		_, _ = unsafeio.WriteString(w, file)
+		_, _ = unsafeio.WriteString(w, ":")
 		_, _ = strconvio.WriteInt(w, int64(f.Line), 10)
-		_, _ = io.WriteString(w, "\n")
+		_, _ = unsafeio.WriteString(w, "\n")
 	}
 }
 
