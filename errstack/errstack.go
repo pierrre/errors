@@ -4,7 +4,6 @@ package errstack
 import (
 	std_errors "errors" // Prevent import cycle.
 	"io"
-	"path/filepath"
 	"runtime"
 
 	"github.com/pierrre/errors/errbase"
@@ -61,16 +60,14 @@ func (err *stack) Is(target error) bool {
 }
 
 func (err *stack) ErrorVerbose(w io.Writer) {
-	_, _ = unsafeio.WriteString(w, "stack\n")
+	_, _ = unsafeio.WriteString(w, "stack:\n")
 	fs := err.RuntimeStackFrames()
 	for more := true; more; {
 		var f runtime.Frame
 		f, more = fs.Next()
-		_, file := filepath.Split(f.File)
-		_, _ = unsafeio.WriteString(w, "\t")
 		_, _ = unsafeio.WriteString(w, f.Function)
-		_, _ = unsafeio.WriteString(w, " ")
-		_, _ = unsafeio.WriteString(w, file)
+		_, _ = unsafeio.WriteString(w, "\n\t")
+		_, _ = unsafeio.WriteString(w, f.File)
 		_, _ = unsafeio.WriteString(w, ":")
 		_, _ = strconvio.WriteInt(w, int64(f.Line), 10)
 		_, _ = unsafeio.WriteString(w, "\n")

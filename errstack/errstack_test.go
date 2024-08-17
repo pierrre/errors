@@ -56,7 +56,8 @@ func TestVerbose(t *testing.T) {
 	sb := new(strings.Builder)
 	v.ErrorVerbose(sb)
 	s := sb.String()
-	assert.RegexpMatch(t, `^stack\n(\t.+ .+:\d+\n)+$`, s)
+	t.Log(s)
+	assert.RegexpMatch(t, `^stack:\n(.+\n\t.+:\d+\n)+$`, s)
 }
 
 func TestStackFrames(t *testing.T) {
