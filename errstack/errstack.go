@@ -115,7 +115,7 @@ func has(err error) bool {
 
 const callersMaxLength = 1 << 16
 
-var callersPool = syncutil.PoolFor[*[]uintptr]{
+var callersPool = syncutil.Pool[*[]uintptr]{
 	New: func() *[]uintptr {
 		v := make([]uintptr, callersMaxLength)
 		return &v

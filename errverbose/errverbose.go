@@ -21,7 +21,7 @@ type Interface interface {
 	ErrorVerbose(w io.Writer)
 }
 
-var depthPool = syncutil.PoolFor[*[]int]{
+var depthPool = syncutil.Pool[*[]int]{
 	New: func() *[]int {
 		v := make([]int, 100)
 		return &v
