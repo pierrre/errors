@@ -40,3 +40,41 @@ func BenchmarkIter(b *testing.B) {
 		erriter.Iter(err, func(err error) {})
 	}
 }
+
+func TestAll(t *testing.T) {
+	err := newtestError()
+	count := 0
+	for err := range erriter.All(err) {
+		count++
+		assert.Error(t, err)
+	}
+	assert.Equal(t, count, 5)
+}
+
+func TestAllStop(t *testing.T) {
+	err := newtestError()
+	count := 0
+	for range erriter.All(err) {
+		count++
+		if count == 4 {
+			break
+		}
+	}
+	assert.Equal(t, count, 4)
+}
+
+func TestAllAllocs(t *testing.T) {
+	err := newtestError()
+	assert.AllocsPerRun(t, 100, func() {
+		for range erriter.All(err) {
+		}
+	}, 0)
+}
+
+func BenchmarkAll(b *testing.B) {
+	err := newtestError()
+	for range b.N {
+		for range erriter.All(err) {
+		}
+	}
+}

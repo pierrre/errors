@@ -69,19 +69,19 @@ func (err *tag) Tag() (key string, val string) {
 // Get returns the tags added to an error.
 func Get(err error) map[string]string {
 	tags := make(map[string]string)
-	erriter.Iter(err, func(err error) {
+	for err := range erriter.All(err) {
 		errt, ok := err.(interface {
 			Tag() (key string, val string)
 		})
 		if !ok {
-			return
+			continue
 		}
 		k, v := errt.Tag()
 		_, ok = tags[k]
 		if ok {
-			return
+			continue
 		}
 		tags[k] = v
-	})
+	}
 	return tags
 }

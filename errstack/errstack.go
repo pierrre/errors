@@ -95,7 +95,7 @@ func (err *stack) RuntimeStackFrames() *runtime.Frames {
 // Frames returns the list of [runtime.Frames] associated to an error.
 func Frames(err error) []*runtime.Frames {
 	var fss []*runtime.Frames
-	erriter.Iter(err, func(err error) {
+	for err := range erriter.All(err) {
 		errf, ok := err.(interface {
 			RuntimeStackFrames() *runtime.Frames
 		})
@@ -103,7 +103,7 @@ func Frames(err error) []*runtime.Frames {
 			fs := errf.RuntimeStackFrames()
 			fss = append(fss, fs)
 		}
-	})
+	}
 	return fss
 }
 

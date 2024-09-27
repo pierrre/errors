@@ -59,19 +59,19 @@ func (err *value) Value() (key string, val any) {
 // Get returns the values added to an error.
 func Get(err error) map[string]any {
 	vals := make(map[string]any)
-	erriter.Iter(err, func(err error) {
+	for err := range erriter.All(err) {
 		errv, ok := err.(interface {
 			Value() (key string, val any)
 		})
 		if !ok {
-			return
+			continue
 		}
 		k, v := errv.Value()
 		_, ok = vals[k]
 		if ok {
-			return
+			continue
 		}
 		vals[k] = v
-	})
+	}
 	return vals
 }

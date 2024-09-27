@@ -1,17 +1,42 @@
 // Package erriter provides a way to iterate over errors tree.
 package erriter
 
-// Iter iterates over an error tree.
-//
-// It explores the tree recursively, and calls f for each non-nil error.
+import (
+	"iter"
+)
+
+// Iter iterates over an error tree recursively, and calls f for each non-nil error.
 func Iter(err error, f func(err error)) {
-	for err != nil {
+	iterFunc(err, func(err error) bool {
 		f(err)
+		return true
+	})
+}
+
+func iterFunc(err error, f func(err error) bool) bool {
+	for err != nil {
+		ok := f(err)
+		if !ok {
+			return false
+		}
 		var errs []error
 		errs, err = Unwrap(err)
 		for _, err := range errs {
-			Iter(err, f)
+			ok := iterFunc(err, f)
+			if !ok {
+				return false
+			}
 		}
+	}
+	return true
+}
+
+// Iter returns an iterator that iterates over an error tree recursively.
+func All(err error) iter.Seq[error] {
+	return func(yield func(error) bool) {
+		iterFunc(err, func(err error) bool {
+			return yield(err)
+		})
 	}
 }
 
