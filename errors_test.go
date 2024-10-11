@@ -39,6 +39,38 @@ func TestNewf(t *testing.T) {
 	assert.SliceLen(t, sfs, 1)
 }
 
+func TestReportGlobalInitPanics(t *testing.T) {
+	assert.Panics(t, func() {
+		ReportGlobalInit(New("error"))
+	})
+}
+
+var errGlobal = errstack.Wrap(errbase.New("global error"))
+
+func TestCheckGlobalInit(t *testing.T) {
+	called := false
+	CheckGlobalInit(errGlobal, func(err error) {
+		called = true
+		assert.ErrorEqual(t, err, "global error initialization detected, use errbase.New() instead, see https://pkg.go.dev/github.com/pierrre/errors#ReportGlobalInit : global error")
+	})
+	assert.True(t, called)
+}
+
+func TestCheckGlobalInitNoStack(t *testing.T) {
+	err := errbase.New("error")
+	CheckGlobalInit(err, nil)
+}
+
+func TestCheckGlobalInitEmptyPCs(t *testing.T) {
+	err := errstack.WrapSkip(errbase.New("error"), 1000)
+	CheckGlobalInit(err, nil)
+}
+
+func TestCheckGlobalInitNotInit(t *testing.T) {
+	err := New("error")
+	CheckGlobalInit(err, nil)
+}
+
 func TestWrap(t *testing.T) {
 	err := errbase.New("error")
 	err = Wrap(err, "test")
