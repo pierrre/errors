@@ -8,8 +8,8 @@ import (
 
 	"github.com/pierrre/errors/errbase"
 	"github.com/pierrre/errors/erriter"
+	"github.com/pierrre/go-libs/runtimeutil"
 	"github.com/pierrre/go-libs/strconvio"
-	"github.com/pierrre/go-libs/syncutil"
 	"github.com/pierrre/go-libs/unsafeio"
 )
 
@@ -29,7 +29,7 @@ func WrapSkip(err error, skip int) error {
 	}
 	return &stack{
 		error:   err,
-		callers: callers(skip + 1),
+		callers: runtimeutil.GetCallers(skip + 1),
 	}
 }
 
@@ -111,23 +111,4 @@ var errHas = errbase.New("stack")
 
 func has(err error) bool {
 	return std_errors.Is(err, errHas)
-}
-
-const callersMaxLength = 1 << 16
-
-var callersPool = syncutil.Pool[*[]uintptr]{
-	New: func() *[]uintptr {
-		v := make([]uintptr, callersMaxLength)
-		return &v
-	},
-}
-
-func callers(skip int) []uintptr {
-	pcp := callersPool.Get()
-	defer callersPool.Put(pcp)
-	pc := *pcp
-	n := runtime.Callers(skip+2, pc)
-	pcRes := make([]uintptr, n)
-	copy(pcRes, pc)
-	return pcRes
 }
