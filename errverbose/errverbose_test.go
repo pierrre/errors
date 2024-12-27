@@ -36,21 +36,21 @@ func ExampleFormatter() {
 	// Output: error
 }
 
-type testVerbose struct {
+type testVerboseError struct {
 	error
 }
 
-func (v *testVerbose) ErrorVerbose(w io.Writer) {
+func (v *testVerboseError) ErrorVerbose(w io.Writer) {
 	_, _ = unsafeio.WriteString(w, "verbose")
 }
 
-func (v *testVerbose) Unwrap() error {
+func (v *testVerboseError) Unwrap() error {
 	return v.error
 }
 
 func TestWrite(t *testing.T) {
 	err := errbase.New("error")
-	err = &testVerbose{
+	err = &testVerboseError{
 		error: err,
 	}
 	buf := new(strings.Builder)
@@ -61,7 +61,7 @@ func TestWrite(t *testing.T) {
 
 func TestString(t *testing.T) {
 	err := errbase.New("error")
-	err = &testVerbose{
+	err = &testVerboseError{
 		error: err,
 	}
 	s := String(err)
@@ -70,7 +70,7 @@ func TestString(t *testing.T) {
 
 func TestFormatter(t *testing.T) {
 	err := errbase.New("error")
-	err = &testVerbose{
+	err = &testVerboseError{
 		error: err,
 	}
 	f := Formatter(err)
@@ -86,24 +86,24 @@ func TestNil(t *testing.T) {
 }
 
 func TestJoin(t *testing.T) {
-	err := &testVerbose{
+	err := &testVerboseError{
 		error: std_errors.Join(
-			&testVerbose{
+			&testVerboseError{
 				error: std_errors.Join(
-					&testVerbose{
+					&testVerboseError{
 						error: errbase.New("error a"),
 					},
-					&testVerbose{
+					&testVerboseError{
 						error: errbase.New("error b"),
 					},
 				),
 			},
-			&testVerbose{
+			&testVerboseError{
 				error: std_errors.Join(
-					&testVerbose{
+					&testVerboseError{
 						error: errbase.New("error c"),
 					},
-					&testVerbose{
+					&testVerboseError{
 						error: errbase.New("error d"),
 					},
 				),
@@ -142,7 +142,7 @@ verbose
 
 func TestWriteAllocs(t *testing.T) {
 	err := errbase.New("error")
-	err = &testVerbose{
+	err = &testVerboseError{
 		error: err,
 	}
 	assert.AllocsPerRun(t, 100, func() {
@@ -152,7 +152,7 @@ func TestWriteAllocs(t *testing.T) {
 
 func BenchmarkWrite(b *testing.B) {
 	err := errbase.New("error")
-	err = &testVerbose{
+	err = &testVerboseError{
 		error: err,
 	}
 	for range b.N {
