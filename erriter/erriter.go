@@ -31,7 +31,7 @@ func iterFunc(err error, f func(err error) bool) bool {
 	return true
 }
 
-// Iter returns an iterator that iterates over an error tree recursively.
+// All returns an iterator that iterates over an error tree recursively.
 func All(err error) iter.Seq[error] {
 	return func(yield func(error) bool) {
 		iterFunc(err, func(err error) bool {
