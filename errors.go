@@ -94,8 +94,10 @@ func checkGlobalInit(err error, report func(error)) {
 
 // Wrap adds a message to an error, and a stack if it doesn't have one.
 func Wrap(err error, msg string) error {
-	err = errstack.EnsureSkip(err, 1)
-	err = errmsg.Wrap(err, msg)
+	if err != nil {
+		err = errstack.EnsureSkip(err, 1)
+		err = errmsg.Wrap(err, msg)
+	}
 	return err
 }
 
@@ -103,8 +105,10 @@ func Wrap(err error, msg string) error {
 //
 // It doesn't support the %w verb.
 func Wrapf(err error, format string, args ...any) error {
-	err = errstack.EnsureSkip(err, 1)
-	err = errmsg.Wrapf(err, format, args...)
+	if err != nil {
+		err = errstack.EnsureSkip(err, 1)
+		err = errmsg.Wrapf(err, format, args...)
+	}
 	return err
 }
 

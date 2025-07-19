@@ -40,7 +40,7 @@ func Ensure(err error) error {
 
 // EnsureSkip adds a stack to an error if it does not already have one, skipping the given number of frames.
 func EnsureSkip(err error, skip int) error {
-	if !has(err) {
+	if err != nil && !has(err) {
 		err = WrapSkip(err, skip+1)
 	}
 	return err
