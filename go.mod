@@ -7,7 +7,7 @@ toolchain go1.24.1
 require (
 	github.com/pierrre/assert v0.9.1
 	github.com/pierrre/go-libs v0.21.2
-	github.com/pierrre/pretty v0.18.8
+	github.com/pierrre/pretty v0.18.9
 )
 
 require github.com/pierrre/compare v1.4.13 // indirect
