@@ -3,7 +3,9 @@ package errstack_test
 import (
 	"fmt"
 	"io"
+	"iter"
 	"runtime"
+	"slices"
 	"strings"
 	"testing"
 
@@ -18,7 +20,7 @@ func Example() {
 	err := errors.New("error")
 	err = Wrap(err)
 	fmt.Println(err)
-	sfs := Frames(err)
+	sfs := slices.Collect(Frames(err))
 	fmt.Println(len(sfs))
 	// Output:
 	// error
@@ -29,11 +31,11 @@ func Test(t *testing.T) {
 	err := errbase.New("error")
 	err = Ensure(err)
 	err = Ensure(err)
-	sfs := Frames(err)
+	sfs := slices.Collect(Frames(err))
 	assert.SliceLen(t, sfs, 1)
-	sf := sfs[0]
-	assert.NotZero(t, sf)
-	f, _ := sf.Next()
+	sf := slices.Collect(sfs[0])
+	assert.SliceNotEmpty(t, sf)
+	f := sf[0]
 	assert.Equal(t, f.Function, "github.com/pierrre/errors/errstack_test.Test")
 }
 
@@ -82,7 +84,7 @@ func TestJoin(t *testing.T) {
 			),
 		),
 	)
-	sfs := Frames(err)
+	sfs := slices.Collect(Frames(err))
 	assert.SliceLen(t, sfs, 4)
 }
 
@@ -105,13 +107,21 @@ func TestEnsureAllocs(t *testing.T) {
 	runtime.KeepAlive(res)
 }
 
+func TestFramesInterrupt(t *testing.T) {
+	err := errbase.New("error")
+	err = Wrap(err)
+	for range Frames(err) {
+		break
+	}
+}
+
 func TestFramesAllocs(t *testing.T) {
 	err := errbase.New("error")
 	err = Wrap(err)
-	var res []*runtime.Frames
+	var res iter.Seq[iter.Seq[runtime.Frame]]
 	assert.AllocsPerRun(t, 100, func() {
 		res = Frames(err)
-	}, 2)
+	}, 1)
 	runtime.KeepAlive(res)
 }
 
@@ -147,7 +157,7 @@ func BenchmarkEnsure(b *testing.B) {
 func BenchmarkFrames(b *testing.B) {
 	err := errbase.New("error")
 	err = Wrap(err)
-	var res []*runtime.Frames
+	var res iter.Seq[iter.Seq[runtime.Frame]]
 	for b.Loop() {
 		res = Frames(err)
 	}

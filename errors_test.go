@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/fs"
 	"runtime"
+	"slices"
 	"testing"
 
 	"github.com/pierrre/assert"
@@ -28,14 +29,14 @@ func ExampleWrap() {
 func TestNew(t *testing.T) {
 	err := New("error")
 	assert.ErrorEqual(t, err, "error")
-	sfs := errstack.Frames(err)
+	sfs := slices.Collect(errstack.Frames(err))
 	assert.SliceLen(t, sfs, 1)
 }
 
 func TestNewf(t *testing.T) {
 	err := Newf("error %d", 1)
 	assert.ErrorEqual(t, err, "error 1")
-	sfs := errstack.Frames(err)
+	sfs := slices.Collect(errstack.Frames(err))
 	assert.SliceLen(t, sfs, 1)
 }
 
@@ -75,7 +76,7 @@ func TestWrap(t *testing.T) {
 	err := errbase.New("error")
 	err = Wrap(err, "test")
 	assert.ErrorEqual(t, err, "test: error")
-	sfs := errstack.Frames(err)
+	sfs := slices.Collect(errstack.Frames(err))
 	assert.SliceLen(t, sfs, 1)
 }
 
@@ -83,7 +84,7 @@ func TestWrapf(t *testing.T) {
 	err := errbase.New("error")
 	err = Wrapf(err, "test %d", 1)
 	assert.ErrorEqual(t, err, "test 1: error")
-	sfs := errstack.Frames(err)
+	sfs := slices.Collect(errstack.Frames(err))
 	assert.SliceLen(t, sfs, 1)
 }
 

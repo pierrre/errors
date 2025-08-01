@@ -2,7 +2,9 @@ package integrationtest
 
 import (
 	"io"
+	"iter"
 	"runtime"
+	"slices"
 	"testing"
 
 	"github.com/pierrre/assert"
@@ -41,10 +43,12 @@ func TestVerbose(t *testing.T) {
 
 func TestStack(t *testing.T) {
 	err := newTestError()
-	sfs := errstack.Frames(err)
+	sfs := slices.Collect(errstack.Frames(err))
 	assert.SliceLen(t, sfs, 3)
 	for _, sf := range sfs {
-		f, _ := sf.Next()
+		fs := slices.Collect(sf)
+		assert.SliceNotEmpty(t, fs)
+		f := fs[0]
 		assert.Equal(t, f.Function, "github.com/pierrre/errors/integrationtest.newTestError")
 	}
 }
@@ -97,10 +101,10 @@ func TestVerboseAllocs(t *testing.T) {
 
 func TestStackAllocs(t *testing.T) {
 	err := newTestError()
-	var res []*runtime.Frames
+	var res iter.Seq[iter.Seq[runtime.Frame]]
 	assert.AllocsPerRun(t, 100, func() {
-		errstack.Frames(err)
-	}, 6)
+		res = errstack.Frames(err)
+	}, 1)
 	runtime.KeepAlive(res)
 }
 
@@ -166,7 +170,7 @@ func BenchmarkVerbose(b *testing.B) {
 
 func BenchmarkStack(b *testing.B) {
 	err := newTestError()
-	var res []*runtime.Frames
+	var res iter.Seq[iter.Seq[runtime.Frame]]
 	for b.Loop() {
 		res = errstack.Frames(err)
 	}

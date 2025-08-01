@@ -4,12 +4,12 @@ package errstack
 import (
 	std_errors "errors" // Prevent import cycle.
 	"io"
+	"iter"
 	"runtime"
 
 	"github.com/pierrre/errors/errbase"
 	"github.com/pierrre/errors/erriter"
 	"github.com/pierrre/go-libs/runtimeutil"
-	"github.com/pierrre/go-libs/strconvio"
 	"github.com/pierrre/go-libs/unsafeio"
 )
 
@@ -61,17 +61,7 @@ func (err *stack) Is(target error) bool {
 
 func (err *stack) ErrorVerbose(w io.Writer) {
 	_, _ = unsafeio.WriteString(w, "stack:\n")
-	fs := err.RuntimeStackFrames()
-	for more := true; more; {
-		var f runtime.Frame
-		f, more = fs.Next()
-		_, _ = unsafeio.WriteString(w, f.Function)
-		_, _ = unsafeio.WriteString(w, "\n\t")
-		_, _ = unsafeio.WriteString(w, f.File)
-		_, _ = unsafeio.WriteString(w, ":")
-		_, _ = strconvio.WriteInt(w, int64(f.Line), 10)
-		_, _ = unsafeio.WriteString(w, "\n")
-	}
+	_, _ = runtimeutil.WriteFrames(w, runtimeutil.GetCallersFrames(err.callers))
 }
 
 // StackFrames returns the list of PCs associated to the error.
@@ -83,28 +73,21 @@ func (err *stack) StackFrames() []uintptr {
 	return err.callers
 }
 
-// RuntimeStackFrames returns the [runtime.Frames] associated to the error.
-//
-// It should be named StackFrames, but it was not possible because of the compatibility with the Sentry library.
-//
-// There is no stability guarantee for this method.
-func (err *stack) RuntimeStackFrames() *runtime.Frames {
-	return runtime.CallersFrames(err.callers)
-}
-
-// Frames returns the list of [runtime.Frames] associated to an error.
-func Frames(err error) []*runtime.Frames {
-	var fss []*runtime.Frames
-	for err := range erriter.All(err) {
-		errf, ok := err.(interface {
-			RuntimeStackFrames() *runtime.Frames
-		})
-		if ok {
-			fs := errf.RuntimeStackFrames()
-			fss = append(fss, fs)
+// Frames returns the list of [runtime.Frame] associated to an error.
+func Frames(err error) iter.Seq[iter.Seq[runtime.Frame]] {
+	return func(yield func(iter.Seq[runtime.Frame]) bool) {
+		for err := range erriter.All(err) {
+			errf, ok := err.(interface {
+				StackFrames() []uintptr
+			})
+			if ok {
+				fs := runtimeutil.GetCallersFrames(errf.StackFrames())
+				if !yield(fs) {
+					return
+				}
+			}
 		}
 	}
-	return fss
 }
 
 var errHas = errbase.New("stack")
