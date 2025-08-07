@@ -3,6 +3,7 @@ package errtag
 
 import (
 	"io"
+	"iter"
 	"strconv"
 
 	"github.com/pierrre/errors/erriter"
@@ -66,18 +67,29 @@ func (err *tag) Tag() (key string, val string) {
 	return err.key, err.val
 }
 
+// All returns a [iter.Seq2] of tags added to an error.
+func All(err error) iter.Seq2[string, string] {
+	return func(yield func(string, string) bool) {
+		for err := range erriter.All(err) {
+			errt, ok := err.(interface {
+				Tag() (key string, val string)
+			})
+			if !ok {
+				continue
+			}
+			k, v := errt.Tag()
+			if !yield(k, v) {
+				return
+			}
+		}
+	}
+}
+
 // Get returns the tags added to an error.
 func Get(err error) map[string]string {
 	tags := make(map[string]string)
-	for err := range erriter.All(err) {
-		errt, ok := err.(interface {
-			Tag() (key string, val string)
-		})
-		if !ok {
-			continue
-		}
-		k, v := errt.Tag()
-		_, ok = tags[k]
+	for k, v := range All(err) {
+		_, ok := tags[k]
 		if ok {
 			continue
 		}
