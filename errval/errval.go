@@ -3,6 +3,7 @@ package errval
 
 import (
 	"io"
+	"iter"
 
 	"github.com/pierrre/errors/erriter"
 	"github.com/pierrre/go-libs/unsafeio"
@@ -56,18 +57,29 @@ func (err *value) Value() (key string, val any) {
 	return err.key, err.val
 }
 
+// All returns a [iter.Seq2] of values added to an error.
+func All(err error) iter.Seq2[string, any] {
+	return func(yield func(string, any) bool) {
+		for err := range erriter.All(err) {
+			errv, ok := err.(interface {
+				Value() (key string, val any)
+			})
+			if !ok {
+				continue
+			}
+			k, v := errv.Value()
+			if !yield(k, v) {
+				break
+			}
+		}
+	}
+}
+
 // Get returns the values added to an error.
 func Get(err error) map[string]any {
 	vals := make(map[string]any)
-	for err := range erriter.All(err) {
-		errv, ok := err.(interface {
-			Value() (key string, val any)
-		})
-		if !ok {
-			continue
-		}
-		k, v := errv.Value()
-		_, ok = vals[k]
+	for k, v := range All(err) {
+		_, ok := vals[k]
 		if ok {
 			continue
 		}

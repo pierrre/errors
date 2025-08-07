@@ -93,6 +93,19 @@ func TestJoin(t *testing.T) {
 	})
 }
 
+func TestAllInterrupt(t *testing.T) {
+	err := errbase.New("error")
+	err = Wrap(err, "foo", "bar")
+	count := 0
+	for k, v := range All(err) {
+		count++
+		assert.Equal(t, k, "foo")
+		assert.Equal(t, v, "bar")
+		break
+	}
+	assert.Equal(t, count, 1)
+}
+
 func TestWrapAllocs(t *testing.T) {
 	err := errbase.New("error")
 	var res error
