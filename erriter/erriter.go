@@ -5,12 +5,13 @@ import (
 	"iter"
 )
 
-// Iter iterates over an error tree recursively, and calls f for each non-nil error.
-func Iter(err error, f func(err error)) {
-	iterFunc(err, func(err error) bool {
-		f(err)
-		return true
-	})
+// All returns an [iter.Seq] that iterates over an error tree recursively.
+func All(err error) iter.Seq[error] {
+	return func(yield func(error) bool) {
+		iterFunc(err, func(err error) bool {
+			return yield(err)
+		})
+	}
 }
 
 func iterFunc(err error, f func(err error) bool) bool {
@@ -29,15 +30,6 @@ func iterFunc(err error, f func(err error) bool) bool {
 		}
 	}
 	return true
-}
-
-// All returns an iterator that iterates over an error tree recursively.
-func All(err error) iter.Seq[error] {
-	return func(yield func(error) bool) {
-		iterFunc(err, func(err error) bool {
-			return yield(err)
-		})
-	}
 }
 
 // Unwrap unwraps an error.

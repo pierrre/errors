@@ -17,30 +17,6 @@ func newtestError() error {
 	return err
 }
 
-func TestIter(t *testing.T) {
-	err := newtestError()
-	count := 0
-	erriter.Iter(err, func(err error) {
-		count++
-		assert.Error(t, err)
-	})
-	assert.Equal(t, count, 5)
-}
-
-func TestIterAllocs(t *testing.T) {
-	err := newtestError()
-	assert.AllocsPerRun(t, 100, func() {
-		erriter.Iter(err, func(err error) {})
-	}, 0)
-}
-
-func BenchmarkIter(b *testing.B) {
-	err := newtestError()
-	for b.Loop() {
-		erriter.Iter(err, func(err error) {})
-	}
-}
-
 func TestAll(t *testing.T) {
 	err := newtestError()
 	count := 0
