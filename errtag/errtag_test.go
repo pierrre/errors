@@ -174,7 +174,7 @@ func TestWrapFloat64Allocs(t *testing.T) {
 	var res error
 	assert.AllocsPerRun(t, 100, func() {
 		res = WrapFloat64(err, "foo", 12.3)
-	}, 3)
+	}, 2)
 	runtime.KeepAlive(res)
 }
 
