@@ -2,12 +2,10 @@
 package errstack
 
 import (
-	std_errors "errors" // Prevent import cycle.
 	"io"
 	"iter"
 	"runtime"
 
-	"github.com/pierrre/errors/errbase"
 	"github.com/pierrre/errors/erriter"
 	"github.com/pierrre/go-libs/runtimeutil"
 	"github.com/pierrre/go-libs/unsafeio"
@@ -55,10 +53,6 @@ func (err *stack) Unwrap() error {
 	return err.error
 }
 
-func (err *stack) Is(target error) bool {
-	return target == err || target == errHas
-}
-
 func (err *stack) ErrorVerbose(w io.Writer) {
 	_, _ = unsafeio.WriteString(w, "stack:\n")
 	_, _ = runtimeutil.WriteFrames(w, runtimeutil.GetCallersFrames(err.callers))
@@ -90,8 +84,14 @@ func Frames(err error) iter.Seq[iter.Seq[runtime.Frame]] {
 	}
 }
 
-var errHas = errbase.New("stack")
-
 func has(err error) bool {
-	return std_errors.Is(err, errHas)
+	for err := range erriter.All(err) {
+		_, ok := err.(interface {
+			StackFrames() []uintptr
+		})
+		if ok {
+			return true
+		}
+	}
+	return false
 }
