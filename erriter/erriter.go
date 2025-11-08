@@ -40,7 +40,7 @@ func iterFunc(err error, f func(err error) bool) bool {
 func Unwrap(err error) ([]error, error) {
 	switch err := err.(type) { //nolint:errorlint // We want to check which interface is implemented by the current error.
 	case interface{ Unwrap() error }:
-		return nil, err.Unwrap() //nolint:wrapcheck // We want to return the wrapped error.
+		return nil, err.Unwrap()
 	case interface{ Unwrap() []error }:
 		return err.Unwrap(), nil
 	}

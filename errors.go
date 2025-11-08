@@ -27,7 +27,7 @@ func New(msg string) error {
 	if ReportGlobalInit != nil {
 		checkGlobalInit(err, ReportGlobalInit)
 	}
-	return err //nolint: wrapcheck // The error is wrapped.
+	return err
 }
 
 // Newf returns a new error with a formatted message and a stack.
@@ -42,7 +42,7 @@ func Newf(format string, args ...any) error {
 	if ReportGlobalInit != nil {
 		checkGlobalInit(err, ReportGlobalInit)
 	}
-	return err //nolint: wrapcheck // The error is wrapped.
+	return err
 }
 
 // ReportGlobalInit reports a global error initialization.
@@ -126,7 +126,7 @@ func Is(err, target error) bool {
 func Join(errs ...error) error {
 	err := std_errors.Join(errs...)
 	err = errstack.WrapSkip(err, 1)
-	return err //nolint:wrapcheck // The error is wrapped.
+	return err
 }
 
 // Unwrap is an alias for [std_errors.Unwrap].

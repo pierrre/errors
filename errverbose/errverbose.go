@@ -75,7 +75,7 @@ func writeNext(w io.Writer, err error, depth []int) error {
 	for i, e := range errs {
 		write(w, e, append(depth, i))
 	}
-	return err //nolint:wrapcheck // We want to return the wrapped error.
+	return err
 }
 
 var bufferPool = bufpool.Pool{}
