@@ -117,6 +117,11 @@ func As(err error, target any) bool {
 	return std_errors.As(err, target)
 }
 
+// AsType is an alias for [std_errors.AsType].
+func AsType[E error](err error) (E, bool) {
+	return std_errors.AsType[E](err)
+}
+
 // Is is an alias for [std_errors.Is].
 func Is(err, target error) bool {
 	return std_errors.Is(err, target)

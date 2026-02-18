@@ -97,6 +97,15 @@ func TestAs(t *testing.T) {
 	assert.True(t, ok)
 }
 
+func TestAsType(t *testing.T) {
+	err := errbase.New("error")
+	err = &fs.PathError{Err: err}
+	err = Wrap(err, "test")
+	pathError, ok := AsType[*fs.PathError](err)
+	assert.True(t, ok)
+	assert.NotZero(t, pathError)
+}
+
 func TestIs(t *testing.T) {
 	errBase := errbase.New("error")
 	err := Wrap(errBase, "test")
