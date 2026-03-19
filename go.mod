@@ -3,7 +3,7 @@ module github.com/pierrre/errors
 go 1.26.0
 
 require (
-	github.com/pierrre/assert v0.11.1
+	github.com/pierrre/assert v0.12.0
 	github.com/pierrre/go-libs v0.26.1
 	github.com/pierrre/pretty v0.23.0
 )
