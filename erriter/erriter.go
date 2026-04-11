@@ -1,4 +1,4 @@
-// Package erriter provides a way to iterate over errors tree.
+// Package erriter provides a way to iterate over an error tree.
 package erriter
 
 import (

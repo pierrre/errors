@@ -9,7 +9,7 @@ import (
 	"github.com/pierrre/go-libs/unsafeio"
 )
 
-// Wrap marks an errors as temporary.
+// Wrap marks an error as temporary.
 //
 // The verbose message is "temporary = <tmp>".
 func Wrap(err error, tmp bool) error {
