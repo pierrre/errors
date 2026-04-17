@@ -83,5 +83,5 @@ See the provided packages as example:
 ## Migrate from the std `errors` package
 
 - Replace the import `errors` with `github.com/pierrre/errors`
-- Replace `fmt.Errorf("some wessage: %w", err)` with `errors.Wrap(err, "some message")`
+- Replace `fmt.Errorf("some message: %w", err)` with `errors.Wrap(err, "some message")`
 - Use `errbase.New()` for sentinel error

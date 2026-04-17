@@ -12,7 +12,7 @@ import (
 
 // Wrap adds a tag to an error.
 //
-// Tags should be use for short and simple values, such as identifiers.
+// Tags should be used for short and simple values, such as identifiers.
 //
 // The verbose message is "tag <key> = <val>".
 func Wrap(err error, key string, val string) error {

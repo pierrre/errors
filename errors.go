@@ -57,7 +57,7 @@ func Newf(format string, args ...any) error {
 //		return errors.Wrap(ErrGlobal, "myFunc error")
 //	}
 //
-// The default values's behavior is to panic during tests, and do nothing during normal execution.
+// The default value's behavior is to panic during tests, and do nothing during normal execution.
 // It can be disabled by setting it to nil.
 //
 // The implementation of [New] and [Newf] checks if the error is created by a function named "init".
