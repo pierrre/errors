@@ -6,7 +6,7 @@ import (
 	"io"
 
 	"github.com/pierrre/errors/erriter"
-	"github.com/pierrre/go-libs/bufpool"
+	"github.com/pierrre/go-libs/bytesutil"
 	"github.com/pierrre/go-libs/strconvio"
 	"github.com/pierrre/go-libs/syncutil"
 	"github.com/pierrre/go-libs/unsafeio"
@@ -78,14 +78,14 @@ func writeNext(w io.Writer, err error, depth []int) error {
 	return err
 }
 
-var bufferPool = bufpool.Pool{}
+var bytesWriterPool = bytesutil.WriterPool{}
 
 // String returns the error's verbose message as a string.
 func String(err error) string {
-	b := bufferPool.Get()
-	defer bufferPool.Put(b)
-	Write(b, err)
-	return b.String()
+	bw := bytesWriterPool.Get()
+	defer bytesWriterPool.Put(bw)
+	Write(bw, err)
+	return bw.String()
 }
 
 // Formatter returns a [fmt.Formatter] that writes the error's verbose message.
