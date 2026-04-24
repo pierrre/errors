@@ -5,7 +5,7 @@ go 1.26.0
 require (
 	github.com/pierrre/assert v0.13.4
 	github.com/pierrre/go-libs v0.30.10
-	github.com/pierrre/pretty v0.23.3
+	github.com/pierrre/pretty v0.24.0
 )
 
 require github.com/pierrre/compare v1.4.15 // indirect
