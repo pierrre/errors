@@ -55,7 +55,7 @@ func (err *stack) Unwrap() error {
 
 func (err *stack) ErrorVerbose(w io.Writer) {
 	_, _ = unsafeio.WriteString(w, "stack:\n")
-	_, _ = runtimeutil.WriteFrames(w, runtimeutil.GetCallersFrames(err.callers))
+	_, _ = runtimeutil.WriteCallersFrames(w, err.callers)
 }
 
 // StackFrames returns the list of PCs associated to the error.
