@@ -3,7 +3,6 @@ package errtag_test
 import (
 	"fmt"
 	"io"
-	"runtime"
 	"strings"
 	"testing"
 
@@ -13,6 +12,8 @@ import (
 	. "github.com/pierrre/errors/errtag"
 	"github.com/pierrre/errors/errverbose"
 )
+
+var testSink any
 
 func Example() {
 	err := errbase.New("error")
@@ -148,7 +149,7 @@ func TestWrapAllocs(t *testing.T) {
 	assert.AllocsPerRun(t, 100, func() {
 		res = Wrap(err, "foo", "bar")
 	}, 1)
-	runtime.KeepAlive(res)
+	testSink = res
 }
 
 func TestWrapIntAllocs(t *testing.T) {
@@ -157,7 +158,7 @@ func TestWrapIntAllocs(t *testing.T) {
 	assert.AllocsPerRun(t, 100, func() {
 		res = WrapInt(err, "foo", 123)
 	}, 2)
-	runtime.KeepAlive(res)
+	testSink = res
 }
 
 func TestWrapInt64Allocs(t *testing.T) {
@@ -166,7 +167,7 @@ func TestWrapInt64Allocs(t *testing.T) {
 	assert.AllocsPerRun(t, 100, func() {
 		res = WrapInt64(err, "foo", 123)
 	}, 2)
-	runtime.KeepAlive(res)
+	testSink = res
 }
 
 func TestWrapFloat64Allocs(t *testing.T) {
@@ -175,7 +176,7 @@ func TestWrapFloat64Allocs(t *testing.T) {
 	assert.AllocsPerRun(t, 100, func() {
 		res = WrapFloat64(err, "foo", 12.3)
 	}, 2)
-	runtime.KeepAlive(res)
+	testSink = res
 }
 
 func TestWrapBoolAllocs(t *testing.T) {
@@ -184,7 +185,7 @@ func TestWrapBoolAllocs(t *testing.T) {
 	assert.AllocsPerRun(t, 100, func() {
 		res = WrapBool(err, "foo", true)
 	}, 1)
-	runtime.KeepAlive(res)
+	testSink = res
 }
 
 func TestGetAllocs(t *testing.T) {
@@ -194,7 +195,7 @@ func TestGetAllocs(t *testing.T) {
 	assert.AllocsPerRun(t, 100, func() {
 		res = Get(err)
 	}, 2)
-	runtime.KeepAlive(res)
+	testSink = res
 }
 
 func TestVerboseAllocs(t *testing.T) {
@@ -209,57 +210,45 @@ func TestVerboseAllocs(t *testing.T) {
 
 func BenchmarkWrap(b *testing.B) {
 	err := errbase.New("error")
-	var res error
 	for b.Loop() {
-		res = Wrap(err, "foo", "bar")
+		_ = Wrap(err, "foo", "bar")
 	}
-	runtime.KeepAlive(res)
 }
 
 func BenchmarkWrapInt(b *testing.B) {
 	err := errbase.New("error")
-	var res error
 	for b.Loop() {
-		res = WrapInt(err, "foo", 123)
+		_ = WrapInt(err, "foo", 123)
 	}
-	runtime.KeepAlive(res)
 }
 
 func BenchmarkWrapInt64(b *testing.B) {
 	err := errbase.New("error")
-	var res error
 	for b.Loop() {
-		res = WrapInt64(err, "foo", 123)
+		_ = WrapInt64(err, "foo", 123)
 	}
-	runtime.KeepAlive(res)
 }
 
 func BenchmarkWrapFloat64(b *testing.B) {
 	err := errbase.New("error")
-	var res error
 	for b.Loop() {
-		res = WrapFloat64(err, "foo", 12.3)
+		_ = WrapFloat64(err, "foo", 12.3)
 	}
-	runtime.KeepAlive(res)
 }
 
 func BenchmarkWrapBool(b *testing.B) {
 	err := errbase.New("error")
-	var res error
 	for b.Loop() {
-		res = WrapBool(err, "foo", true)
+		_ = WrapBool(err, "foo", true)
 	}
-	runtime.KeepAlive(res)
 }
 
 func BenchmarkGet(b *testing.B) {
 	err := errbase.New("error")
 	err = Wrap(err, "foo", "bar")
-	var res map[string]string
 	for b.Loop() {
-		res = Get(err)
+		_ = Get(err)
 	}
-	runtime.KeepAlive(res)
 }
 
 func BenchmarkVerbose(b *testing.B) {

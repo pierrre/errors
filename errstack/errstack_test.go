@@ -16,6 +16,8 @@ import (
 	"github.com/pierrre/errors/errverbose"
 )
 
+var testSink any
+
 func Example() {
 	err := errors.New("error")
 	err = Wrap(err)
@@ -94,7 +96,7 @@ func TestWrapAllocs(t *testing.T) {
 	assert.AllocsPerRun(t, 100, func() {
 		res = Wrap(err)
 	}, 2)
-	runtime.KeepAlive(res)
+	testSink = res
 }
 
 func TestEnsureAllocs(t *testing.T) {
@@ -104,7 +106,7 @@ func TestEnsureAllocs(t *testing.T) {
 	assert.AllocsPerRun(t, 100, func() {
 		res = Ensure(err)
 	}, 0)
-	runtime.KeepAlive(res)
+	testSink = res
 }
 
 func TestFramesInterrupt(t *testing.T) {
@@ -122,7 +124,7 @@ func TestFramesAllocs(t *testing.T) {
 	assert.AllocsPerRun(t, 100, func() {
 		res = Frames(err)
 	}, 1)
-	runtime.KeepAlive(res)
+	testSink = res
 }
 
 func TestVerboseAllocs(t *testing.T) {
@@ -137,31 +139,25 @@ func TestVerboseAllocs(t *testing.T) {
 
 func BenchmarkWrap(b *testing.B) {
 	err := errbase.New("error")
-	var res error
 	for b.Loop() {
-		res = Wrap(err)
+		_ = Wrap(err)
 	}
-	runtime.KeepAlive(res)
 }
 
 func BenchmarkEnsure(b *testing.B) {
 	err := errbase.New("error")
 	err = Ensure(err)
-	var res error
 	for b.Loop() {
-		res = Ensure(err)
+		_ = Ensure(err)
 	}
-	runtime.KeepAlive(res)
 }
 
 func BenchmarkFrames(b *testing.B) {
 	err := errbase.New("error")
 	err = Wrap(err)
-	var res iter.Seq[iter.Seq[runtime.Frame]]
 	for b.Loop() {
-		res = Frames(err)
+		_ = Frames(err)
 	}
-	runtime.KeepAlive(res)
 }
 
 func BenchmarkVerbose(b *testing.B) {
