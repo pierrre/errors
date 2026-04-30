@@ -2,12 +2,13 @@ package errbase_test
 
 import (
 	"fmt"
-	"runtime"
 	"testing"
 
 	"github.com/pierrre/assert"
 	. "github.com/pierrre/errors/errbase"
 )
+
+var testSink any
 
 func Example() {
 	err := New("error")
@@ -26,7 +27,7 @@ func TestNewAllocs(t *testing.T) {
 	assert.AllocsPerRun(t, 100, func() {
 		res = New("error")
 	}, 1)
-	runtime.KeepAlive(res)
+	testSink = res
 }
 
 func TestNewfAllocs(t *testing.T) {
@@ -34,7 +35,7 @@ func TestNewfAllocs(t *testing.T) {
 	assert.AllocsPerRun(t, 100, func() {
 		res = Newf("error %d", 1)
 	}, 2)
-	runtime.KeepAlive(res)
+	testSink = res
 }
 
 func TestErrorAllocs(t *testing.T) {
@@ -43,30 +44,24 @@ func TestErrorAllocs(t *testing.T) {
 	assert.AllocsPerRun(t, 100, func() {
 		res = err.Error()
 	}, 0)
-	runtime.KeepAlive(res)
+	testSink = res
 }
 
 func BenchmarkNew(b *testing.B) {
-	var res error
 	for b.Loop() {
-		res = New("error")
+		_ = New("error")
 	}
-	runtime.KeepAlive(res)
 }
 
 func BenchmarkNewf(b *testing.B) {
-	var res error
 	for b.Loop() {
-		res = Newf("error %d", 1)
+		_ = Newf("error %d", 1)
 	}
-	runtime.KeepAlive(res)
 }
 
 func BenchmarkError(b *testing.B) {
 	err := New("error")
-	var res string
 	for b.Loop() {
-		res = err.Error()
+		_ = err.Error()
 	}
-	runtime.KeepAlive(res)
 }

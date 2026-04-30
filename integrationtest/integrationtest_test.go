@@ -17,6 +17,8 @@ import (
 	"github.com/pierrre/errors/errverbose"
 )
 
+var testSink any
+
 func newTestError() error {
 	err := errors.Join(
 		errors.New("error a"),
@@ -80,7 +82,7 @@ func TestNewAllocs(t *testing.T) {
 	assert.AllocsPerRun(t, 100, func() {
 		res = newTestError()
 	}, 18)
-	runtime.KeepAlive(res)
+	testSink = res
 }
 
 func TestErrorAllocs(t *testing.T) {
@@ -89,7 +91,7 @@ func TestErrorAllocs(t *testing.T) {
 	assert.AllocsPerRun(t, 100, func() {
 		res = err.Error()
 	}, 0)
-	runtime.KeepAlive(res)
+	testSink = res
 }
 
 func TestVerboseAllocs(t *testing.T) {
@@ -105,7 +107,7 @@ func TestStackAllocs(t *testing.T) {
 	assert.AllocsPerRun(t, 100, func() {
 		res = errstack.Frames(err)
 	}, 1)
-	runtime.KeepAlive(res)
+	testSink = res
 }
 
 func TestIgnoreAllocs(t *testing.T) {
@@ -114,7 +116,7 @@ func TestIgnoreAllocs(t *testing.T) {
 	assert.AllocsPerRun(t, 100, func() {
 		res = errignore.Is(err)
 	}, 1)
-	runtime.KeepAlive(res)
+	testSink = res
 }
 
 func TestTemporaryAllocs(t *testing.T) {
@@ -123,7 +125,7 @@ func TestTemporaryAllocs(t *testing.T) {
 	assert.AllocsPerRun(t, 100, func() {
 		res = errtmp.Is(err)
 	}, 1)
-	runtime.KeepAlive(res)
+	testSink = res
 }
 
 func TestTagAllocs(t *testing.T) {
@@ -132,7 +134,7 @@ func TestTagAllocs(t *testing.T) {
 	assert.AllocsPerRun(t, 100, func() {
 		res = errtag.Get(err)
 	}, 2)
-	runtime.KeepAlive(res)
+	testSink = res
 }
 
 func TestValueAllocs(t *testing.T) {
@@ -141,24 +143,20 @@ func TestValueAllocs(t *testing.T) {
 	assert.AllocsPerRun(t, 100, func() {
 		res = errval.Get(err)
 	}, 2)
-	runtime.KeepAlive(res)
+	testSink = res
 }
 
 func BenchmarkNew(b *testing.B) {
-	var res error
 	for b.Loop() {
-		res = newTestError()
+		_ = newTestError()
 	}
-	runtime.KeepAlive(res)
 }
 
 func BenchmarkError(b *testing.B) {
 	err := newTestError()
-	var res string
 	for b.Loop() {
-		res = err.Error()
+		_ = err.Error()
 	}
-	runtime.KeepAlive(res)
 }
 
 func BenchmarkVerbose(b *testing.B) {
@@ -170,45 +168,35 @@ func BenchmarkVerbose(b *testing.B) {
 
 func BenchmarkStack(b *testing.B) {
 	err := newTestError()
-	var res iter.Seq[iter.Seq[runtime.Frame]]
 	for b.Loop() {
-		res = errstack.Frames(err)
+		_ = errstack.Frames(err)
 	}
-	runtime.KeepAlive(res)
 }
 
 func BenchmarkIgnore(b *testing.B) {
 	err := newTestError()
-	var res bool
 	for b.Loop() {
-		res = errignore.Is(err)
+		_ = errignore.Is(err)
 	}
-	runtime.KeepAlive(res)
 }
 
 func BenchmarkTemporary(b *testing.B) {
 	err := newTestError()
-	var res bool
 	for b.Loop() {
-		res = errtmp.Is(err)
+		_ = errtmp.Is(err)
 	}
-	runtime.KeepAlive(res)
 }
 
 func BenchmarkTag(b *testing.B) {
 	err := newTestError()
-	var res map[string]string
 	for b.Loop() {
-		res = errtag.Get(err)
+		_ = errtag.Get(err)
 	}
-	runtime.KeepAlive(res)
 }
 
 func BenchmarkValue(b *testing.B) {
 	err := newTestError()
-	var res map[string]any
 	for b.Loop() {
-		res = errval.Get(err)
+		_ = errval.Get(err)
 	}
-	runtime.KeepAlive(res)
 }

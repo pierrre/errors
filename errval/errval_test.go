@@ -3,7 +3,6 @@ package errval_test
 import (
 	"fmt"
 	"io"
-	"runtime"
 	"strings"
 	"testing"
 
@@ -13,6 +12,8 @@ import (
 	. "github.com/pierrre/errors/errval"
 	"github.com/pierrre/errors/errverbose"
 )
+
+var testSink any
 
 func Example() {
 	err := errbase.New("error")
@@ -112,7 +113,7 @@ func TestWrapAllocs(t *testing.T) {
 	assert.AllocsPerRun(t, 100, func() {
 		res = Wrap(err, "foo", "bar")
 	}, 1)
-	runtime.KeepAlive(res)
+	testSink = res
 }
 
 func TestGetAllocs(t *testing.T) {
@@ -122,7 +123,7 @@ func TestGetAllocs(t *testing.T) {
 	assert.AllocsPerRun(t, 100, func() {
 		res = Get(err)
 	}, 2)
-	runtime.KeepAlive(res)
+	testSink = res
 }
 
 func TestVerboseAllocs(t *testing.T) {
@@ -137,21 +138,17 @@ func TestVerboseAllocs(t *testing.T) {
 
 func BenchmarkWrap(b *testing.B) {
 	err := errbase.New("error")
-	var res error
 	for b.Loop() {
-		res = Wrap(err, "foo", "bar")
+		_ = Wrap(err, "foo", "bar")
 	}
-	runtime.KeepAlive(res)
 }
 
 func BenchmarkGet(b *testing.B) {
 	err := errbase.New("error")
 	err = Wrap(err, "foo", "bar")
-	var res map[string]any
 	for b.Loop() {
-		res = Get(err)
+		_ = Get(err)
 	}
-	runtime.KeepAlive(res)
 }
 
 func BenchmarkVerbose(b *testing.B) {

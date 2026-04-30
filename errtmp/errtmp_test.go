@@ -3,7 +3,6 @@ package errtmp_test
 import (
 	"fmt"
 	"io"
-	"runtime"
 	"strings"
 	"testing"
 
@@ -13,6 +12,8 @@ import (
 	. "github.com/pierrre/errors/errtmp"
 	"github.com/pierrre/errors/errverbose"
 )
+
+var testSink any
 
 func Example() {
 	err := errbase.New("error")
@@ -77,7 +78,7 @@ func TestWrapAllocs(t *testing.T) {
 	assert.AllocsPerRun(t, 100, func() {
 		res = Wrap(err, true)
 	}, 1)
-	runtime.KeepAlive(res)
+	testSink = res
 }
 
 func TestIsAllocs(t *testing.T) {
@@ -86,7 +87,7 @@ func TestIsAllocs(t *testing.T) {
 	assert.AllocsPerRun(t, 100, func() {
 		res = Is(err)
 	}, 1)
-	runtime.KeepAlive(res)
+	testSink = res
 }
 
 func TestVerboseAllocs(t *testing.T) {
@@ -101,21 +102,17 @@ func TestVerboseAllocs(t *testing.T) {
 
 func BenchmarkWrap(b *testing.B) {
 	err := errbase.New("error")
-	var res error
 	for b.Loop() {
-		res = Wrap(err, true)
+		_ = Wrap(err, true)
 	}
-	runtime.KeepAlive(res)
 }
 
 func BenchmarkIs(b *testing.B) {
 	err := errbase.New("error")
 	err = Wrap(err, true)
-	var res bool
 	for b.Loop() {
-		res = Is(err)
+		_ = Is(err)
 	}
-	runtime.KeepAlive(res)
 }
 
 func BenchmarkVerbose(b *testing.B) {
