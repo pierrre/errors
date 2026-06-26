@@ -85,7 +85,7 @@ func checkGlobalInit(err error, report func(error)) {
 		return
 	}
 	f := runtime.FuncForPC(pcs[0])
-	if !strings.HasSuffix(f.Name(), ".init") {
+	if f == nil || !strings.HasSuffix(f.Name(), ".init") {
 		return
 	}
 	err = Wrap(err, "global error initialization detected, use errbase.New() instead, see https://pkg.go.dev/github.com/pierrre/errors#ReportGlobalInit ")
