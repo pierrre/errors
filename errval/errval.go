@@ -69,7 +69,7 @@ func All(err error) iter.Seq2[string, any] {
 			}
 			k, v := errv.Value()
 			if !yield(k, v) {
-				break
+				return
 			}
 		}
 	}
