@@ -70,7 +70,7 @@ Create a custom error type:
 - Optionally implement the [`Unwrap() error`](https://pkg.go.dev/errors#Unwrap) method
 - Optionally implement the [`errverbose.Interface`](https://pkg.go.dev/github.com/pierrre/errors/errverbose#Interface) interface
 
-See the provided packages as example:
+See the provided packages as an example:
 
 - [`errbase`](https://pkg.go.dev/github.com/pierrre/errors/errbase): create a base error (e.g. sentinel error)
 - [`errmsg`](https://pkg.go.dev/github.com/pierrre/errors/errmsg): add a message to an error
@@ -84,4 +84,4 @@ See the provided packages as example:
 
 - Replace the import `errors` with `github.com/pierrre/errors`
 - Replace `fmt.Errorf("some message: %w", err)` with `errors.Wrap(err, "some message")`
-- Use `errbase.New()` for sentinel error
+- Use `errbase.New()` for sentinel errors

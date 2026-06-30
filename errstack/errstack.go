@@ -58,7 +58,7 @@ func (err *stack) ErrorVerbose(w io.Writer) {
 	_, _ = runtimeutil.WriteCallersFrames(w, err.callers)
 }
 
-// StackFrames returns the list of PCs associated to the error.
+// StackFrames returns the list of PCs associated with the error.
 //
 // It exists and is named StackFrames in order to be compatible with the Sentry library, which expects this name.
 //
@@ -67,7 +67,7 @@ func (err *stack) StackFrames() []uintptr {
 	return err.callers
 }
 
-// Frames returns the list of [runtime.Frame] associated to an error.
+// Frames returns the list of [runtime.Frame] associated with an error.
 func Frames(err error) iter.Seq[iter.Seq[runtime.Frame]] {
 	return func(yield func(iter.Seq[runtime.Frame]) bool) {
 		for err := range erriter.All(err) {
