@@ -130,7 +130,9 @@ func Is(err, target error) bool {
 // Join calls [std_errors.Join] and adds a stack.
 func Join(errs ...error) error {
 	err := std_errors.Join(errs...)
-	err = errstack.WrapSkip(err, 1)
+	if err != nil {
+		err = errstack.WrapSkip(err, 1)
+	}
 	return err
 }
 
