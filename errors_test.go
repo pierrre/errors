@@ -81,12 +81,24 @@ func TestWrap(t *testing.T) {
 	assert.SliceLen(t, sfs, 1)
 }
 
+func TestWrapNil(t *testing.T) {
+	var err error
+	err = Wrap(err, "test")
+	assert.Zero(t, err)
+}
+
 func TestWrapf(t *testing.T) {
 	err := errbase.New("error")
 	err = Wrapf(err, "test %d", 1)
 	assert.ErrorEqual(t, err, "test 1: error")
 	sfs := slices.Collect(errstack.Frames(err))
 	assert.SliceLen(t, sfs, 1)
+}
+
+func TestWrapfNil(t *testing.T) {
+	var err error
+	err = Wrapf(err, "test %d", 1)
+	assert.Zero(t, err)
 }
 
 func TestAs(t *testing.T) {
@@ -122,6 +134,11 @@ func TestJoin(t *testing.T) {
 	}](t, err)
 	errs := errUnwrap.Unwrap()
 	assert.SliceLen(t, errs, 2)
+}
+
+func TestJoinNil(t *testing.T) {
+	err := Join(nil, nil)
+	assert.Zero(t, err)
 }
 
 func TestUnwrap(t *testing.T) {
