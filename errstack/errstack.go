@@ -20,7 +20,7 @@ func Wrap(err error) error {
 	return WrapSkip(err, 1)
 }
 
-// WrapSkip calls [Wrap], skipping the given number of frames.
+// WrapSkip is like [Wrap], but skips the given number of frames.
 func WrapSkip(err error, skip int) error {
 	if err == nil {
 		return nil

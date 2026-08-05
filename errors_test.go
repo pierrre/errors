@@ -53,7 +53,7 @@ func TestCheckGlobalInit(t *testing.T) {
 	called := false
 	CheckGlobalInit(errGlobal, func(err error) {
 		called = true
-		assert.ErrorEqual(t, err, "global error initialization detected, use errbase.New() instead, see https://pkg.go.dev/github.com/pierrre/errors#ReportGlobalInit : global error")
+		assert.ErrorEqual(t, err, "global error initialization detected, use errbase.New() instead, see https://pkg.go.dev/github.com/pierrre/errors#ReportGlobalInit: global error")
 	})
 	assert.True(t, called)
 }

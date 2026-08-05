@@ -10,7 +10,7 @@ import (
 	"github.com/pierrre/errors/errmsg"
 )
 
-func newtestError() error {
+func newTestError() error {
 	err := errbase.New("error")
 	err = errors.Join(err, err)
 	err = errmsg.Wrap(err, "test")
@@ -18,7 +18,7 @@ func newtestError() error {
 }
 
 func TestAll(t *testing.T) {
-	err := newtestError()
+	err := newTestError()
 	count := 0
 	for err := range erriter.All(err) {
 		count++
@@ -28,7 +28,7 @@ func TestAll(t *testing.T) {
 }
 
 func TestAllStop(t *testing.T) {
-	err := newtestError()
+	err := newTestError()
 	count := 0
 	for range erriter.All(err) {
 		count++
@@ -40,7 +40,7 @@ func TestAllStop(t *testing.T) {
 }
 
 func TestAllAllocs(t *testing.T) {
-	err := newtestError()
+	err := newTestError()
 	assert.AllocsPerRun(t, 100, func() {
 		for range erriter.All(err) {
 		}
@@ -48,7 +48,7 @@ func TestAllAllocs(t *testing.T) {
 }
 
 func BenchmarkAll(b *testing.B) {
-	err := newtestError()
+	err := newTestError()
 	for b.Loop() {
 		for range erriter.All(err) {
 		}
