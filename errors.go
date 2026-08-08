@@ -12,6 +12,7 @@ import (
 	"github.com/pierrre/errors/errbase"
 	"github.com/pierrre/errors/errmsg"
 	"github.com/pierrre/errors/errstack"
+	"github.com/pierrre/go-libs/syncutil/atomicutil"
 )
 
 // ErrUnsupported is an alias for [std_errors.ErrUnsupported].
@@ -24,8 +25,9 @@ var ErrUnsupported = std_errors.ErrUnsupported
 func New(msg string) error {
 	err := errbase.New(msg)
 	err = errstack.WrapSkip(err, 1)
-	if ReportGlobalInit != nil {
-		checkGlobalInit(err, ReportGlobalInit)
+	report := ReportGlobalInit.Load()
+	if report != nil {
+		checkGlobalInit(err, report)
 	}
 	return err
 }
@@ -39,8 +41,9 @@ func New(msg string) error {
 func Newf(format string, args ...any) error {
 	err := errbase.Newf(format, args...)
 	err = errstack.WrapSkip(err, 1)
-	if ReportGlobalInit != nil {
-		checkGlobalInit(err, ReportGlobalInit)
+	report := ReportGlobalInit.Load()
+	if report != nil {
+		checkGlobalInit(err, report)
 	}
 	return err
 }
@@ -62,15 +65,17 @@ func Newf(format string, args ...any) error {
 //
 // The implementation of [New] and [Newf] checks if the error is created by a function named "init".
 // It doesn't report errors created by "init()" functions, which are named "init.N" where N is a number.
-var ReportGlobalInit func(error) = func() func(error) {
+var ReportGlobalInit atomicutil.Value[func(error)]
+
+func init() {
 	var f func(error)
 	if testing.Testing() {
 		f = func(err error) {
 			panic(err)
 		}
 	}
-	return f
-}()
+	ReportGlobalInit.Store(f)
+}
 
 func checkGlobalInit(err error, report func(error)) {
 	// This code doesn't call [errstack.Frames] to avoid memory allocations.

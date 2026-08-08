@@ -6,6 +6,7 @@ import (
 	"iter"
 
 	"github.com/pierrre/errors/erriter"
+	"github.com/pierrre/go-libs/syncutil/atomicutil"
 	"github.com/pierrre/go-libs/unsafeio"
 	"github.com/pierrre/pretty"
 )
@@ -15,7 +16,11 @@ import (
 // It can be changed in order to customize how values are formatted.
 //
 // By default it uses [pretty.Write].
-var VerboseWriter func(io.Writer, any) = prettyWrite
+var VerboseWriter atomicutil.Value[func(io.Writer, any)]
+
+func init() {
+	VerboseWriter.Store(prettyWrite)
+}
 
 func prettyWrite(w io.Writer, v any) {
 	pretty.Write(w, v)
@@ -50,7 +55,7 @@ func (err *value) ErrorVerbose(w io.Writer) {
 	_, _ = unsafeio.WriteString(w, "value ")
 	_, _ = unsafeio.WriteString(w, err.key)
 	_, _ = unsafeio.WriteString(w, " = ")
-	VerboseWriter(w, err.val)
+	VerboseWriter.Load()(w, err.val)
 }
 
 func (err *value) Value() (key string, val any) {

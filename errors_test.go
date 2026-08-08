@@ -43,7 +43,7 @@ func TestNewf(t *testing.T) {
 
 func TestReportGlobalInitPanics(t *testing.T) {
 	assert.Panics(t, func() {
-		ReportGlobalInit(New("error"))
+		ReportGlobalInit.Load()(New("error"))
 	})
 }
 
