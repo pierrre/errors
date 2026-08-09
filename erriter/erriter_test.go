@@ -1,6 +1,7 @@
 package erriter_test
 
 import (
+	std_errors "errors"
 	"testing"
 
 	"github.com/pierrre/assert"
@@ -37,6 +38,22 @@ func TestAllStop(t *testing.T) {
 		}
 	}
 	assert.Equal(t, count, 4)
+}
+
+func TestAllTraversalOrder(t *testing.T) {
+	a := errbase.New("a")
+	b := errbase.New("b")
+	c := errbase.New("c")
+	j1 := std_errors.Join(a, b)
+	w1 := errmsg.Wrap(j1, "w1")
+	w2 := errmsg.Wrap(c, "w2")
+	j0 := std_errors.Join(w1, w2)
+	err := errmsg.Wrap(j0, "w0")
+	var got []error
+	for e := range erriter.All(err) {
+		got = append(got, e)
+	}
+	assert.SliceEqual(t, got, []error{err, j0, w1, j1, a, b, w2, c})
 }
 
 func TestAllAllocs(t *testing.T) {
