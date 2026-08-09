@@ -7,7 +7,6 @@ import (
 	std_errors "errors"
 	"runtime"
 	"strings"
-	"testing"
 
 	"github.com/pierrre/errors/errbase"
 	"github.com/pierrre/errors/errmsg"
@@ -63,19 +62,12 @@ func Newf(format string, args ...any) error {
 // The default value's behavior is to panic during tests, and do nothing during normal execution.
 // It can be disabled by setting it to nil.
 //
+// By default the "testing" package is imported to detect test execution, which adds it to consumers' production binaries.
+// This can be avoided by building with the "errorsnotesting" build tag, which disables the automatic detection (the variable's default becomes nil).
+//
 // The implementation of [New] and [Newf] checks if the error is created by a function named "init".
 // It doesn't report errors created by "init()" functions, which are named "init.N" where N is a number.
 var ReportGlobalInit atomicutil.Value[func(error)]
-
-func init() {
-	var f func(error)
-	if testing.Testing() {
-		f = func(err error) {
-			panic(err)
-		}
-	}
-	ReportGlobalInit.Store(f)
-}
 
 func checkGlobalInit(err error, report func(error)) {
 	// This code doesn't call [errstack.Frames] to avoid memory allocations.
