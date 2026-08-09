@@ -82,13 +82,5 @@ func All(err error) iter.Seq2[string, any] {
 
 // Get returns the values added to an error.
 func Get(err error) map[string]any {
-	vals := make(map[string]any)
-	for k, v := range All(err) {
-		_, ok := vals[k]
-		if ok {
-			continue
-		}
-		vals[k] = v
-	}
-	return vals
+	return erriter.FirstKeys(All(err))
 }
