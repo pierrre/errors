@@ -136,6 +136,92 @@ func TestVerboseAllocs(t *testing.T) {
 	}, 0)
 }
 
+func ExampleGetValue() {
+	err := errbase.New("error")
+	err = Wrap(err, "foo", "bar")
+	val, ok := GetValue(err, "foo")
+	fmt.Println(ok, val)
+	// Output: true bar
+}
+
+func TestGetValue(t *testing.T) {
+	err := errbase.New("error")
+	err = Wrap(err, "foo", "bar")
+	val, ok := GetValue(err, "foo")
+	assert.True(t, ok)
+	assert.Equal(t, val, "bar")
+}
+
+func TestGetValueNotFound(t *testing.T) {
+	err := errbase.New("error")
+	err = Wrap(err, "foo", "bar")
+	val, ok := GetValue(err, "baz")
+	assert.False(t, ok)
+	assert.Equal(t, val, nil)
+}
+
+func TestGetValueOverWrite(t *testing.T) {
+	err := errbase.New("error")
+	err = Wrap(err, "test", 1)
+	err = Wrap(err, "test", 2)
+	val, ok := GetValue(err, "test")
+	assert.True(t, ok)
+	assert.Equal(t, val, 2)
+}
+
+func TestGetValueEmpty(t *testing.T) {
+	err := errbase.New("error")
+	val, ok := GetValue(err, "foo")
+	assert.False(t, ok)
+	assert.Equal(t, val, nil)
+}
+
+func TestGetValueNil(t *testing.T) {
+	val, ok := GetValue(nil, "foo")
+	assert.False(t, ok)
+	assert.Equal(t, val, nil)
+}
+
+func TestGetValueJoin(t *testing.T) {
+	err := Wrap(
+		errors.Join(
+			Wrap(
+				errors.New("error"),
+				"foo",
+				"baz",
+			),
+			Wrap(
+				errors.New("error"),
+				"aaa",
+				"bbb",
+			),
+		),
+		"foo",
+		"bar",
+	)
+	val, ok := GetValue(err, "foo")
+	assert.True(t, ok)
+	assert.Equal(t, val, "bar")
+	val, ok = GetValue(err, "aaa")
+	assert.True(t, ok)
+	assert.Equal(t, val, "bbb")
+	val, ok = GetValue(err, "missing")
+	assert.False(t, ok)
+	assert.Equal(t, val, nil)
+}
+
+func TestGetValueAllocs(t *testing.T) {
+	err := errbase.New("error")
+	err = Wrap(err, "foo", "bar")
+	var res any
+	var ok bool
+	assert.AllocsPerRun(t, 100, func() {
+		res, ok = GetValue(err, "foo")
+	}, 0)
+	testSink = res
+	testSink = ok
+}
+
 func BenchmarkWrap(b *testing.B) {
 	err := errbase.New("error")
 	for b.Loop() {
@@ -148,6 +234,14 @@ func BenchmarkGet(b *testing.B) {
 	err = Wrap(err, "foo", "bar")
 	for b.Loop() {
 		_ = Get(err)
+	}
+}
+
+func BenchmarkGetValue(b *testing.B) {
+	err := errbase.New("error")
+	err = Wrap(err, "foo", "bar")
+	for b.Loop() {
+		_, _ = GetValue(err, "foo")
 	}
 }
 
