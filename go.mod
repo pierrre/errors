@@ -6,6 +6,7 @@ require (
 	github.com/pierrre/assert v0.15.3
 	github.com/pierrre/go-libs v0.34.3
 	github.com/pierrre/pretty v0.26.3
+	golang.org/x/exp v0.0.0-20260727155853-b88d891fe743
 )
 
 require github.com/pierrre/compare v1.5.0 // indirect

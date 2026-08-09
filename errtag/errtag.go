@@ -2,12 +2,15 @@
 package errtag
 
 import (
+	"fmt"
 	"io"
 	"iter"
+	"reflect"
 	"strconv"
 
 	"github.com/pierrre/errors/erriter"
 	"github.com/pierrre/go-libs/unsafeio"
+	"golang.org/x/exp/constraints"
 )
 
 // Wrap adds a tag to an error.
@@ -44,6 +47,30 @@ func WrapFloat64(err error, key string, value float64) error {
 // WrapBool is a helper for [Wrap] with bool value.
 func WrapBool(err error, key string, value bool) error {
 	return Wrap(err, key, strconv.FormatBool(value))
+}
+
+// WrapTag is a helper for [Wrap] with a numeric or boolean value.
+//
+// The type parameter T accepts any type whose underlying type is an integer, a float, or a bool.
+func WrapTag[T constraints.Integer | constraints.Float | ~bool](err error, key string, value T) error {
+	return Wrap(err, key, formatTag(value))
+}
+
+func formatTag[T constraints.Integer | constraints.Float | ~bool](value T) string {
+	switch v := any(value).(type) {
+	case bool:
+		return strconv.FormatBool(v)
+	case float32:
+		return strconv.FormatFloat(float64(v), 'g', -1, 32)
+	case float64:
+		return strconv.FormatFloat(v, 'g', -1, 64)
+	case int, int8, int16, int32, int64:
+		return strconv.FormatInt(reflect.ValueOf(v).Int(), 10)
+	case uint, uint8, uint16, uint32, uint64:
+		return strconv.FormatUint(reflect.ValueOf(v).Uint(), 10)
+	default:
+		return fmt.Sprint(value)
+	}
 }
 
 type tag struct {

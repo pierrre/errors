@@ -6,3 +6,5 @@ github.com/pierrre/go-libs v0.34.3 h1:ln+qtDN7V4zCwmAMqvKYx7AiH7FxBDgHHtecA5w4dd
 github.com/pierrre/go-libs v0.34.3/go.mod h1:5Fr5EGlSmOhrPOGfPLz4nwR4ljKoe/gek04XrWmYNNM=
 github.com/pierrre/pretty v0.26.3 h1:SGMw0pzkwydFFcJNGNqUogsTsfR0dXu0ewCjU7YANGg=
 github.com/pierrre/pretty v0.26.3/go.mod h1:EQ/1+xdxqUNrLufKLLJup++HOY8+Lu/aXHRO3ZOuHQU=
+golang.org/x/exp v0.0.0-20260727155853-b88d891fe743 h1:ex206bKw+v3K0dm3andkrIF+ijyQKJG1pLgwQ2PYdQM=
+golang.org/x/exp v0.0.0-20260727155853-b88d891fe743/go.mod h1:EdfpwwqSu+0Li0mzskwHU6FWDV3t9Q+RZDo3QMUtL3Q=

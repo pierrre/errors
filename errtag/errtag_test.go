@@ -11,6 +11,7 @@ import (
 	"github.com/pierrre/errors/errbase"
 	. "github.com/pierrre/errors/errtag"
 	"github.com/pierrre/errors/errverbose"
+	"golang.org/x/exp/constraints"
 )
 
 var testSink any
@@ -66,6 +67,41 @@ func TestBool(t *testing.T) {
 	assert.MapEqual(t, tags, map[string]string{
 		"foo": "true",
 	})
+}
+
+type customInt int
+
+func testWrapTag[T constraints.Integer | constraints.Float | ~bool](t *testing.T, value T, want string) {
+	t.Helper()
+	err := errbase.New("error")
+	err = WrapTag(err, "foo", value)
+	tags := Get(err)
+	assert.MapEqual(t, tags, map[string]string{
+		"foo": want,
+	})
+}
+
+func TestTag(t *testing.T) {
+	testWrapTag(t, 123, "123")
+	testWrapTag(t, int8(8), "8")
+	testWrapTag(t, int16(16), "16")
+	testWrapTag(t, int32(32), "32")
+	testWrapTag(t, int64(64), "64")
+	testWrapTag(t, uint(42), "42")
+	testWrapTag(t, uint8(8), "8")
+	testWrapTag(t, uint16(16), "16")
+	testWrapTag(t, uint32(32), "32")
+	testWrapTag(t, uint64(64), "64")
+	testWrapTag(t, float32(12.3), "12.3")
+	testWrapTag(t, float64(12.3), "12.3")
+	testWrapTag(t, true, "true")
+	testWrapTag(t, false, "false")
+	testWrapTag(t, customInt(7), "7")
+}
+
+func TestTagNil(t *testing.T) {
+	err := WrapTag(nil, "foo", 123)
+	assert.NoError(t, err)
 }
 
 func TestOverWrite(t *testing.T) {
