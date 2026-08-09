@@ -79,6 +79,8 @@ See the provided packages as an example:
 - [`errval`](https://pkg.go.dev/github.com/pierrre/errors/errval): add a value to an error
 - [`errignore`](https://pkg.go.dev/github.com/pierrre/errors/errignore): mark an error as ignored
 - [`errtmp`](https://pkg.go.dev/github.com/pierrre/errors/errtmp): mark an error as temporary
+- [`erriter`](https://pkg.go.dev/github.com/pierrre/errors/erriter): iterate over an error tree
+- [`errverbose`](https://pkg.go.dev/github.com/pierrre/errors/errverbose): manage error verbose messages
 
 ## Migrate from the std `errors` package
 
