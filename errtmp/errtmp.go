@@ -42,7 +42,9 @@ func (err *temporary) Temporary() bool {
 
 // Is returns true if an error is temporary, false otherwise.
 //
-// By default, an error is temporary.
+// By default, an error is considered temporary.
+// This is the opposite of the usual convention where an error that does not implement a Temporary() bool method is considered not temporary.
+// To explicitly mark an error as not temporary, wrap it with [Wrap] and the value false.
 func Is(err error) bool {
 	var werr interface {
 		Temporary() bool
