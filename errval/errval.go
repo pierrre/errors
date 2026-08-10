@@ -84,3 +84,15 @@ func All(err error) iter.Seq2[string, any] {
 func Get(err error) map[string]any {
 	return erriter.FirstKeys(All(err))
 }
+
+// GetValue returns the first value added to an error for the given key.
+//
+// It returns false if the key is not found.
+func GetValue(err error, key string) (any, bool) {
+	for k, v := range All(err) {
+		if k == key {
+			return v, true
+		}
+	}
+	return nil, false
+}
