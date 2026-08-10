@@ -47,6 +47,27 @@ func TestAllAllocs(t *testing.T) {
 	}, 0)
 }
 
+func TestFirstKeys(t *testing.T) {
+	seq := func(yield func(string, int) bool) {
+		yield("a", 1)
+		yield("b", 2)
+		yield("a", 3)
+		yield("c", 4)
+	}
+	m := erriter.FirstKeys(seq)
+	assert.MapEqual(t, m, map[string]int{
+		"a": 1,
+		"b": 2,
+		"c": 4,
+	})
+}
+
+func TestFirstKeysEmpty(t *testing.T) {
+	seq := func(yield func(string, int) bool) {}
+	m := erriter.FirstKeys(seq)
+	assert.MapEmpty(t, m)
+}
+
 func BenchmarkAll(b *testing.B) {
 	err := newTestError()
 	for b.Loop() {
