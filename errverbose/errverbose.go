@@ -15,10 +15,21 @@ import (
 // Interface is an error that provides verbose information.
 //
 // It is used by [Write].
+//
+// [AppendInterface] is an alternative that appends the verbose message to a byte slice instead of returning a string, avoiding the string allocation.
 type Interface interface {
-	// ErrorVerbose writes the error verbose message.
-	// It must only write the verbose message of the error, not the error chain.
-	ErrorVerbose(w io.Writer)
+	// ErrorVerbose returns the error verbose message.
+	// It must only return the verbose message of the error, not the error chain.
+	// It must not end with a newline.
+	ErrorVerbose() string
+}
+
+// AppendInterface is an interface that can be implemented by error types that want to provide a custom verbose error message when appended to a byte slice.
+//
+// It is an alternative to [Interface] that appends the verbose message directly to the destination byte slice.
+// This avoids the intermediate string allocation of [Interface], which is beneficial for performance.
+type AppendInterface interface {
+	ErrorVerboseAppend(b []byte) []byte
 }
 
 var depthPool = syncutil.Pool[*[]int]{
@@ -56,9 +67,12 @@ func write(bw *bytesutil.Writer, err error, depth []int) {
 	*bw = errappend.Append(*bw, err)
 	bw.AppendByte('\n')
 	for ; err != nil; err = writeNext(bw, err, depth) {
-		v, ok := err.(Interface)
-		if ok {
-			v.ErrorVerbose(bw)
+		switch v := err.(type) { //nolint:errorlint // We want to check for specific error types.
+		case Interface:
+			bw.AppendString(v.ErrorVerbose())
+			bw.AppendByte('\n')
+		case AppendInterface:
+			*bw = v.ErrorVerboseAppend(*bw)
 			bw.AppendByte('\n')
 		}
 	}

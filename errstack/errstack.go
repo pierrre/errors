@@ -2,14 +2,12 @@
 package errstack
 
 import (
-	"io"
 	"iter"
 	"runtime"
 
 	"github.com/pierrre/errors/errappend"
 	"github.com/pierrre/errors/erriter"
 	"github.com/pierrre/go-libs/runtimeutil"
-	"github.com/pierrre/go-libs/unsafeio"
 )
 
 // Wrap adds a stack to an error.
@@ -58,9 +56,10 @@ func (err *stack) ErrorAppend(b []byte) []byte {
 	return errappend.Append(b, err.error)
 }
 
-func (err *stack) ErrorVerbose(w io.Writer) {
-	_, _ = unsafeio.WriteString(w, "stack:\n")
-	_, _ = runtimeutil.WriteCallersFrames(w, err.callers)
+func (err *stack) ErrorVerboseAppend(b []byte) []byte {
+	b = append(b, "stack:\n"...)
+	b = runtimeutil.AppendCallersFrames(b, err.callers)
+	return b
 }
 
 // StackFrames returns the list of PCs associated with the error.

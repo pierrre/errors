@@ -10,7 +10,6 @@ import (
 	"github.com/pierrre/assert"
 	"github.com/pierrre/errors/errbase"
 	. "github.com/pierrre/errors/errverbose"
-	"github.com/pierrre/go-libs/unsafeio"
 )
 
 func ExampleWrite() {
@@ -40,11 +39,23 @@ type testVerboseError struct {
 	error
 }
 
-func (v *testVerboseError) ErrorVerbose(w io.Writer) {
-	_, _ = unsafeio.WriteString(w, "verbose")
+func (v *testVerboseError) ErrorVerbose() string {
+	return "verbose"
 }
 
 func (v *testVerboseError) Unwrap() error {
+	return v.error
+}
+
+type testAppendVerboseError struct {
+	error
+}
+
+func (v *testAppendVerboseError) ErrorVerboseAppend(b []byte) []byte {
+	return append(b, "verbose append"...)
+}
+
+func (v *testAppendVerboseError) Unwrap() error {
 	return v.error
 }
 
@@ -66,6 +77,17 @@ func TestString(t *testing.T) {
 	}
 	s := String(err)
 	assert.Equal(t, s, "error\nverbose\n")
+}
+
+func TestWriteAppendInterface(t *testing.T) {
+	err := errbase.New("error")
+	err = &testAppendVerboseError{
+		error: err,
+	}
+	buf := new(strings.Builder)
+	Write(buf, err)
+	s := buf.String()
+	assert.Equal(t, s, "error\nverbose append\n")
 }
 
 func TestFormatter(t *testing.T) {
