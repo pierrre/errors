@@ -68,10 +68,12 @@ Create a custom error type:
 
 - Create a type implementing the [`error`](https://pkg.go.dev/builtin#error) interface
 - Optionally implement the [`Unwrap() error`](https://pkg.go.dev/errors#Unwrap) method
+- Optionally implement the [`errappend.Interface`](https://pkg.go.dev/github.com/pierrre/errors/errappend#Interface) interface
 - Optionally implement the [`errverbose.Interface`](https://pkg.go.dev/github.com/pierrre/errors/errverbose#Interface) interface
 
 See the provided packages as an example:
 
+- [`errappend`](https://pkg.go.dev/github.com/pierrre/errors/errappend): append an error message to a byte slice
 - [`errbase`](https://pkg.go.dev/github.com/pierrre/errors/errbase): create a base error (e.g. sentinel error)
 - [`errmsg`](https://pkg.go.dev/github.com/pierrre/errors/errmsg): add a message to an error
 - [`errstack`](https://pkg.go.dev/github.com/pierrre/errors/errstack): add a stack trace to an error
@@ -80,6 +82,7 @@ See the provided packages as an example:
 - [`errignore`](https://pkg.go.dev/github.com/pierrre/errors/errignore): mark an error as ignored
 - [`errtmp`](https://pkg.go.dev/github.com/pierrre/errors/errtmp): mark an error as temporary
 - [`erriter`](https://pkg.go.dev/github.com/pierrre/errors/erriter): iterate over an error tree
+- [`errjoin`](https://pkg.go.dev/github.com/pierrre/errors/errjoin): join multiple errors
 - [`errverbose`](https://pkg.go.dev/github.com/pierrre/errors/errverbose): manage error verbose messages
 
 ## Migrate from the std `errors` package

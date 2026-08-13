@@ -11,7 +11,9 @@ import (
 
 	"github.com/pierrre/assert"
 	"github.com/pierrre/errors"
+	"github.com/pierrre/errors/errappend"
 	"github.com/pierrre/errors/errbase"
+	"github.com/pierrre/errors/errmsg"
 	. "github.com/pierrre/errors/errstack"
 	"github.com/pierrre/errors/errverbose"
 )
@@ -62,6 +64,15 @@ func TestVerbose(t *testing.T) {
 	s := sb.String()
 	t.Log(s)
 	assert.RegexpMatch(t, `^stack:\n(.+\n\t.+:\d+\n)+$`, s)
+}
+
+func TestErrorAppend(t *testing.T) {
+	err := errmsg.Wrap(errbase.New("error"), "msg")
+	err = Wrap(err)
+	var i errappend.Interface
+	assert.ErrorAs(t, err, &i)
+	b := errappend.Append(nil, err)
+	assert.Equal(t, string(b), "msg: error")
 }
 
 func TestStackFrames(t *testing.T) {

@@ -3,6 +3,8 @@ package errmsg
 
 import (
 	"fmt"
+
+	"github.com/pierrre/errors/errappend"
 )
 
 // Wrap adds a message to an error.
@@ -19,7 +21,7 @@ func Wrap(err error, msg string) error {
 	}
 	return &message{
 		error: err,
-		msg:   msg + ": " + err.Error(),
+		msg:   msg,
 	}
 }
 
@@ -40,5 +42,12 @@ func (err *message) Unwrap() error {
 }
 
 func (err *message) Error() string {
-	return err.msg
+	return errappend.String(err)
+}
+
+func (err *message) ErrorAppend(b []byte) []byte {
+	b = append(b, err.msg...)
+	b = append(b, ": "...)
+	b = errappend.Append(b, err.error)
+	return b
 }
