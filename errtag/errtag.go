@@ -2,13 +2,11 @@
 package errtag
 
 import (
-	"io"
 	"iter"
 	"strconv"
 
 	"github.com/pierrre/errors/errappend"
 	"github.com/pierrre/errors/erriter"
-	"github.com/pierrre/go-libs/unsafeio"
 )
 
 // Wrap adds a tag to an error.
@@ -61,11 +59,12 @@ func (err *tag) ErrorAppend(b []byte) []byte {
 	return errappend.Append(b, err.error)
 }
 
-func (err *tag) ErrorVerbose(w io.Writer) {
-	_, _ = unsafeio.WriteString(w, "tag ")
-	_, _ = unsafeio.WriteString(w, err.key)
-	_, _ = unsafeio.WriteString(w, " = ")
-	_, _ = unsafeio.WriteString(w, err.val)
+func (err *tag) ErrorVerboseAppend(b []byte) []byte {
+	b = append(b, "tag "...)
+	b = append(b, err.key...)
+	b = append(b, " = "...)
+	b = append(b, err.val...)
+	return b
 }
 
 func (err *tag) Tag() (key string, val string) {

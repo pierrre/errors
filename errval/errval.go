@@ -7,8 +7,8 @@ import (
 
 	"github.com/pierrre/errors/errappend"
 	"github.com/pierrre/errors/erriter"
+	"github.com/pierrre/go-libs/bytesutil"
 	"github.com/pierrre/go-libs/syncutil/atomicutil"
-	"github.com/pierrre/go-libs/unsafeio"
 	"github.com/pierrre/pretty"
 )
 
@@ -56,11 +56,15 @@ func (err *value) ErrorAppend(b []byte) []byte {
 	return errappend.Append(b, err.error)
 }
 
-func (err *value) ErrorVerbose(w io.Writer) {
-	_, _ = unsafeio.WriteString(w, "value ")
-	_, _ = unsafeio.WriteString(w, err.key)
-	_, _ = unsafeio.WriteString(w, " = ")
-	VerboseWriter.Load()(w, err.val)
+func (err *value) ErrorVerboseAppend(b []byte) []byte {
+	b = append(b, "value "...)
+	b = append(b, err.key...)
+	b = append(b, " = "...)
+	bw := bytesWriterPool.Get()
+	defer bytesWriterPool.Put(bw)
+	VerboseWriter.Load()(bw, err.val)
+	b = append(b, *bw...)
+	return b
 }
 
 func (err *value) Value() (key string, val any) {
@@ -101,3 +105,5 @@ func GetValue(err error, key string) (any, bool) {
 	}
 	return nil, false
 }
+
+var bytesWriterPool = &bytesutil.WriterPool{}

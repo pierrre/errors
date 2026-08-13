@@ -2,11 +2,9 @@ package errstack_test
 
 import (
 	"fmt"
-	"io"
 	"iter"
 	"runtime"
 	"slices"
-	"strings"
 	"testing"
 
 	"github.com/pierrre/assert"
@@ -57,11 +55,10 @@ func TestError(t *testing.T) {
 func TestVerbose(t *testing.T) {
 	err := errbase.New("error")
 	err = Wrap(err)
-	var v errverbose.Interface
+	var v errverbose.AppendInterface
 	assert.ErrorAs(t, err, &v)
-	sb := new(strings.Builder)
-	v.ErrorVerbose(sb)
-	s := sb.String()
+	b := v.ErrorVerboseAppend(nil)
+	s := string(b)
 	t.Log(s)
 	assert.RegexpMatch(t, `^stack:\n(.+\n\t.+:\d+\n)+$`, s)
 }
@@ -141,10 +138,12 @@ func TestFramesAllocs(t *testing.T) {
 func TestVerboseAllocs(t *testing.T) {
 	err := errbase.New("error")
 	err = Wrap(err)
-	var v errverbose.Interface
+	var v errverbose.AppendInterface
 	assert.ErrorAs(t, err, &v)
+	var b []byte
 	assert.AllocsPerRun(t, 100, func() {
-		v.ErrorVerbose(io.Discard)
+		b = v.ErrorVerboseAppend(b)
+		b = b[:0]
 	}, 1)
 }
 
@@ -174,9 +173,11 @@ func BenchmarkFrames(b *testing.B) {
 func BenchmarkVerbose(b *testing.B) {
 	err := errbase.New("error")
 	err = Wrap(err)
-	var v errverbose.Interface
+	var v errverbose.AppendInterface
 	assert.ErrorAs(b, err, &v)
+	var buf []byte
 	for b.Loop() {
-		v.ErrorVerbose(io.Discard)
+		buf = v.ErrorVerboseAppend(buf)
+		buf = buf[:0]
 	}
 }

@@ -2,11 +2,8 @@
 package errignore
 
 import (
-	"io"
-
 	"github.com/pierrre/errors"
 	"github.com/pierrre/errors/errappend"
-	"github.com/pierrre/go-libs/unsafeio"
 )
 
 // Wrap marks an error as ignored.
@@ -33,8 +30,8 @@ func (err *ignore) ErrorAppend(b []byte) []byte {
 	return errappend.Append(b, err.error)
 }
 
-func (err *ignore) ErrorVerbose(w io.Writer) {
-	_, _ = unsafeio.WriteString(w, "ignored")
+func (err *ignore) ErrorVerbose() string {
+	return "ignored"
 }
 
 func (err *ignore) Ignored() bool {

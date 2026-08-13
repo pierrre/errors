@@ -2,8 +2,6 @@ package errignore_test
 
 import (
 	"fmt"
-	"io"
-	"strings"
 	"testing"
 
 	"github.com/pierrre/assert"
@@ -54,9 +52,7 @@ func TestVerbose(t *testing.T) {
 	err = Wrap(err)
 	var v errverbose.Interface
 	assert.ErrorAs(t, err, &v)
-	sb := new(strings.Builder)
-	v.ErrorVerbose(sb)
-	s := sb.String()
+	s := v.ErrorVerbose()
 	assert.Equal(t, s, "ignored")
 }
 
@@ -101,7 +97,7 @@ func TestVerboseAllocs(t *testing.T) {
 	var v errverbose.Interface
 	assert.ErrorAs(t, err, &v)
 	assert.AllocsPerRun(t, 100, func() {
-		v.ErrorVerbose(io.Discard)
+		_ = v.ErrorVerbose()
 	}, 0)
 }
 
@@ -126,6 +122,6 @@ func BenchmarkVerbose(b *testing.B) {
 	var v errverbose.Interface
 	assert.ErrorAs(b, err, &v)
 	for b.Loop() {
-		v.ErrorVerbose(io.Discard)
+		_ = v.ErrorVerbose()
 	}
 }

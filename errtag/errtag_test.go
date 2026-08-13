@@ -2,8 +2,6 @@ package errtag_test
 
 import (
 	"fmt"
-	"io"
-	"strings"
 	"testing"
 
 	"github.com/pierrre/assert"
@@ -100,12 +98,10 @@ func TestError(t *testing.T) {
 func TestVerbose(t *testing.T) {
 	err := errbase.New("error")
 	err = Wrap(err, "foo", "bar")
-	var v errverbose.Interface
+	var v errverbose.AppendInterface
 	assert.ErrorAs(t, err, &v)
-	sb := new(strings.Builder)
-	v.ErrorVerbose(sb)
-	s := sb.String()
-	assert.Equal(t, s, "tag foo = bar")
+	b := v.ErrorVerboseAppend(nil)
+	assert.Equal(t, string(b), "tag foo = bar")
 }
 
 func TestErrorAppend(t *testing.T) {
@@ -212,10 +208,12 @@ func TestGetAllocs(t *testing.T) {
 func TestVerboseAllocs(t *testing.T) {
 	err := errbase.New("error")
 	err = Wrap(err, "foo", "bar")
-	var v errverbose.Interface
+	var v errverbose.AppendInterface
 	assert.ErrorAs(t, err, &v)
+	var b []byte
 	assert.AllocsPerRun(t, 100, func() {
-		v.ErrorVerbose(io.Discard)
+		b = v.ErrorVerboseAppend(b)
+		b = b[:0]
 	}, 0)
 }
 
@@ -265,9 +263,11 @@ func BenchmarkGet(b *testing.B) {
 func BenchmarkVerbose(b *testing.B) {
 	err := errbase.New("error")
 	err = Wrap(err, "foo", "bar")
-	var v errverbose.Interface
+	var v errverbose.AppendInterface
 	assert.ErrorAs(b, err, &v)
+	var buf []byte
 	for b.Loop() {
-		v.ErrorVerbose(io.Discard)
+		buf = v.ErrorVerboseAppend(buf)
+		buf = buf[:0]
 	}
 }
