@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/pierrre/errors/errbase"
+	"github.com/pierrre/errors/errjoin"
 	"github.com/pierrre/errors/errmsg"
 	"github.com/pierrre/errors/errstack"
 	"github.com/pierrre/go-libs/syncutil/atomicutil"
@@ -134,7 +135,7 @@ func Is(err, target error) bool {
 
 // Join calls [std_errors.Join] and adds a stack.
 func Join(errs ...error) error {
-	err := std_errors.Join(errs...)
+	err := errjoin.Join(errs...)
 	if err != nil {
 		err = errstack.WrapSkip(err, 1)
 	}
