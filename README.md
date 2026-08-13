@@ -69,7 +69,7 @@ Create a custom error type:
 - Create a type implementing the [`error`](https://pkg.go.dev/builtin#error) interface
 - Optionally implement the [`Unwrap() error`](https://pkg.go.dev/errors#Unwrap) method
 - Optionally implement the [`errappend.Interface`](https://pkg.go.dev/github.com/pierrre/errors/errappend#Interface) interface
-- Optionally implement the [`errverbose.Interface`](https://pkg.go.dev/github.com/pierrre/errors/errverbose#Interface) interface
+- Optionally implement the [`errverbose.Interface`](https://pkg.go.dev/github.com/pierrre/errors/errverbose#Interface) interface, or the [`errverbose.AppendInterface`](https://pkg.go.dev/github.com/pierrre/errors/errverbose#AppendInterface) interface for an allocation-free verbose message
 
 See the provided packages as an example:
 
