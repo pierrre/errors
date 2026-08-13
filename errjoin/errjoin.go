@@ -2,7 +2,7 @@
 package errjoin
 
 import (
-	"unsafe" //nolint:depguard // Allow unsafe for performance reasons.
+	"github.com/pierrre/errors/errappend"
 )
 
 // Join returns an error that wraps the given errors.
@@ -45,14 +45,17 @@ func (e *joinError) Error() string {
 	if len(e.errs) == 1 {
 		return e.errs[0].Error()
 	}
+	return errappend.String(e)
+}
 
-	b := []byte(e.errs[0].Error())
-	for _, err := range e.errs[1:] {
-		b = append(b, '\n')
-		b = append(b, err.Error()...)
+func (e *joinError) ErrorAppend(b []byte) []byte {
+	for i, err := range e.errs {
+		if i != 0 {
+			b = append(b, '\n')
+		}
+		b = errappend.Append(b, err)
 	}
-	// At this point, b has at least one byte '\n'.
-	return unsafe.String(&b[0], len(b))
+	return b
 }
 
 func (e *joinError) Unwrap() []error {

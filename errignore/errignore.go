@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"github.com/pierrre/errors"
+	"github.com/pierrre/errors/errappend"
 	"github.com/pierrre/go-libs/unsafeio"
 )
 
@@ -26,6 +27,10 @@ type ignore struct {
 
 func (err *ignore) Unwrap() error {
 	return err.error
+}
+
+func (err *ignore) ErrorAppend(b []byte) []byte {
+	return errappend.Append(b, err.error)
 }
 
 func (err *ignore) ErrorVerbose(w io.Writer) {

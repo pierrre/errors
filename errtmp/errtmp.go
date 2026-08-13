@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"github.com/pierrre/errors"
+	"github.com/pierrre/errors/errappend"
 	"github.com/pierrre/go-libs/strconvio"
 	"github.com/pierrre/go-libs/unsafeio"
 )
@@ -29,6 +30,10 @@ type temporary struct {
 
 func (err *temporary) Unwrap() error {
 	return err.error
+}
+
+func (err *temporary) ErrorAppend(b []byte) []byte {
+	return errappend.Append(b, err.error)
 }
 
 func (err *temporary) ErrorVerbose(w io.Writer) {

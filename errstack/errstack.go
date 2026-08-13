@@ -6,6 +6,7 @@ import (
 	"iter"
 	"runtime"
 
+	"github.com/pierrre/errors/errappend"
 	"github.com/pierrre/errors/erriter"
 	"github.com/pierrre/go-libs/runtimeutil"
 	"github.com/pierrre/go-libs/unsafeio"
@@ -51,6 +52,10 @@ type stack struct {
 
 func (err *stack) Unwrap() error {
 	return err.error
+}
+
+func (err *stack) ErrorAppend(b []byte) []byte {
+	return errappend.Append(b, err.error)
 }
 
 func (err *stack) ErrorVerbose(w io.Writer) {

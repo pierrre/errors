@@ -5,6 +5,7 @@ import (
 	"io"
 	"iter"
 
+	"github.com/pierrre/errors/errappend"
 	"github.com/pierrre/errors/erriter"
 	"github.com/pierrre/go-libs/syncutil/atomicutil"
 	"github.com/pierrre/go-libs/unsafeio"
@@ -49,6 +50,10 @@ type value struct {
 
 func (err *value) Unwrap() error {
 	return err.error
+}
+
+func (err *value) ErrorAppend(b []byte) []byte {
+	return errappend.Append(b, err.error)
 }
 
 func (err *value) ErrorVerbose(w io.Writer) {

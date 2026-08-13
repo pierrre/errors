@@ -89,7 +89,7 @@ func TestErrorAllocs(t *testing.T) {
 	var res string
 	assert.AllocsPerRun(t, 100, func() {
 		res = err.Error()
-	}, 2)
+	}, 1)
 	testSink = res
 }
 

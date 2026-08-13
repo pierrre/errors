@@ -8,7 +8,9 @@ import (
 
 	"github.com/pierrre/assert"
 	"github.com/pierrre/errors"
+	"github.com/pierrre/errors/errappend"
 	"github.com/pierrre/errors/errbase"
+	"github.com/pierrre/errors/errmsg"
 	. "github.com/pierrre/errors/errtmp"
 	"github.com/pierrre/errors/errverbose"
 )
@@ -70,6 +72,15 @@ func TestUnwrap(t *testing.T) {
 	err2 := Wrap(err1, true)
 	err2 = errors.Unwrap(err2)
 	assert.Equal(t, err2, err1)
+}
+
+func TestErrorAppend(t *testing.T) {
+	err := errmsg.Wrap(errbase.New("error"), "msg")
+	err = Wrap(err, true)
+	var i errappend.Interface
+	assert.ErrorAs(t, err, &i)
+	b := errappend.Append(nil, err)
+	assert.Equal(t, string(b), "msg: error")
 }
 
 func TestWrapAllocs(t *testing.T) {

@@ -4,12 +4,12 @@ package errverbose
 import (
 	"fmt"
 	"io"
+	"strconv"
 
+	"github.com/pierrre/errors/errappend"
 	"github.com/pierrre/errors/erriter"
 	"github.com/pierrre/go-libs/bytesutil"
-	"github.com/pierrre/go-libs/strconvio"
 	"github.com/pierrre/go-libs/syncutil"
-	"github.com/pierrre/go-libs/unsafeio"
 )
 
 // Interface is an error that provides verbose information.
@@ -36,49 +36,57 @@ func Write(w io.Writer, err error) {
 	depthP := depthPool.Get()
 	defer depthPool.Put(depthP)
 	depth := (*depthP)[:0]
-	write(w, err, depth)
+	bw, ok := w.(*bytesutil.Writer)
+	if !ok {
+		bw = bytesWriterPool.Get()
+		defer func() {
+			_, _ = w.Write(*bw)
+			bytesWriterPool.Put(bw)
+		}()
+	}
+	write(bw, err, depth)
 }
 
-func write(w io.Writer, err error, depth []int) {
-	writeSub(w, depth)
+func write(bw *bytesutil.Writer, err error, depth []int) {
+	writeSub(bw, depth)
 	if err == nil {
-		_, _ = unsafeio.WriteString(w, "<nil>\n")
+		bw.AppendString("<nil>\n")
 		return
 	}
-	_, _ = unsafeio.WriteString(w, err.Error())
-	_, _ = unsafeio.WriteString(w, "\n")
-	for ; err != nil; err = writeNext(w, err, depth) {
+	*bw = errappend.Append(*bw, err)
+	bw.AppendByte('\n')
+	for ; err != nil; err = writeNext(bw, err, depth) {
 		v, ok := err.(Interface)
 		if ok {
-			v.ErrorVerbose(w)
-			_, _ = unsafeio.WriteString(w, "\n")
+			v.ErrorVerbose(bw)
+			bw.AppendByte('\n')
 		}
 	}
 }
 
-func writeSub(w io.Writer, depth []int) {
+func writeSub(bw *bytesutil.Writer, depth []int) {
 	if len(depth) == 0 {
 		return
 	}
-	_, _ = unsafeio.WriteString(w, "\nSub error ")
+	bw.AppendString("\nSub error ")
 	for i, d := range depth {
 		if i > 0 {
-			_, _ = unsafeio.WriteString(w, ".")
+			bw.AppendString(".")
 		}
-		_, _ = strconvio.WriteInt(w, int64(d), 10)
+		*bw = strconv.AppendInt(*bw, int64(d), 10)
 	}
-	_, _ = unsafeio.WriteString(w, ": ")
+	bw.AppendString(": ")
 }
 
-func writeNext(w io.Writer, err error, depth []int) error {
+func writeNext(bw *bytesutil.Writer, err error, depth []int) error {
 	errs, err := erriter.Unwrap(err)
 	for i, e := range errs {
-		write(w, e, append(depth, i))
+		write(bw, e, append(depth, i))
 	}
 	return err
 }
 
-var bytesWriterPool = bytesutil.WriterPool{}
+var bytesWriterPool = &bytesutil.WriterPool{}
 
 // String returns the error's verbose message as a string.
 func String(err error) string {

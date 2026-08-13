@@ -170,7 +170,7 @@ func TestWrapAllocs(t *testing.T) {
 	var res error
 	assert.AllocsPerRun(t, 100, func() {
 		res = Wrap(err, "test")
-	}, 4)
+	}, 3)
 	testSink = res
 }
 
@@ -179,7 +179,7 @@ func TestWrapfAllocs(t *testing.T) {
 	var res error
 	assert.AllocsPerRun(t, 100, func() {
 		res = Wrapf(err, "test %d", 1)
-	}, 5)
+	}, 4)
 	testSink = res
 }
 

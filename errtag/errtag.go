@@ -6,6 +6,7 @@ import (
 	"iter"
 	"strconv"
 
+	"github.com/pierrre/errors/errappend"
 	"github.com/pierrre/errors/erriter"
 	"github.com/pierrre/go-libs/unsafeio"
 )
@@ -54,6 +55,10 @@ type tag struct {
 
 func (err *tag) Unwrap() error {
 	return err.error
+}
+
+func (err *tag) ErrorAppend(b []byte) []byte {
+	return errappend.Append(b, err.error)
 }
 
 func (err *tag) ErrorVerbose(w io.Writer) {
