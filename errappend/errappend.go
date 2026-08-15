@@ -30,7 +30,7 @@ func Append(b []byte, err error) []byte {
 	if err == nil {
 		return b
 	}
-	if a, ok := err.(Interface); ok {
+	if a, ok := err.(Interface); ok { //nolint:errorlint // We only check the top-level error.
 		return a.ErrorAppend(b)
 	}
 	return append(b, err.Error()...)
