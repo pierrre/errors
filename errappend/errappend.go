@@ -7,6 +7,7 @@ import (
 
 // Interface is an interface that can be implemented by error types that want to provide a custom error message when appended to a byte slice.
 type Interface interface {
+	error
 	ErrorAppend(b []byte) []byte
 }
 

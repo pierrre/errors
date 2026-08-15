@@ -18,6 +18,7 @@ import (
 //
 // [AppendInterface] is an alternative that appends the verbose message to a byte slice instead of returning a string, avoiding the string allocation.
 type Interface interface {
+	error
 	// ErrorVerbose returns the error verbose message.
 	// It must only return the verbose message of the error, not the error chain.
 	// It must not end with a newline.
@@ -29,6 +30,7 @@ type Interface interface {
 // It is an alternative to [Interface] that appends the verbose message directly to the destination byte slice.
 // This avoids the intermediate string allocation of [Interface], which is beneficial for performance.
 type AppendInterface interface {
+	error
 	ErrorVerboseAppend(b []byte) []byte
 }
 

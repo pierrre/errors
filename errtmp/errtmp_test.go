@@ -57,8 +57,7 @@ func TestError(t *testing.T) {
 func TestVerbose(t *testing.T) {
 	err := errbase.New("error")
 	err = Wrap(err, true)
-	var v errverbose.AppendInterface
-	assert.ErrorAs(t, err, &v)
+	v, _ := assert.ErrorAsType[errverbose.AppendInterface](t, err)
 	b := v.ErrorVerboseAppend(nil)
 	assert.Equal(t, string(b), "temporary = true")
 }
@@ -73,8 +72,7 @@ func TestUnwrap(t *testing.T) {
 func TestErrorAppend(t *testing.T) {
 	err := errmsg.Wrap(errbase.New("error"), "msg")
 	err = Wrap(err, true)
-	var i errappend.Interface
-	assert.ErrorAs(t, err, &i)
+	_, _ = assert.ErrorAsType[errappend.Interface](t, err)
 	b := errappend.Append(nil, err)
 	assert.Equal(t, string(b), "msg: error")
 }
@@ -100,8 +98,7 @@ func TestIsAllocs(t *testing.T) {
 func TestVerboseAllocs(t *testing.T) {
 	err := errbase.New("error")
 	err = Wrap(err, true)
-	var v errverbose.AppendInterface
-	assert.ErrorAs(t, err, &v)
+	v, _ := assert.ErrorAsType[errverbose.AppendInterface](t, err)
 	var b []byte
 	assert.AllocsPerRun(t, 100, func() {
 		b = v.ErrorVerboseAppend(b)
@@ -127,8 +124,7 @@ func BenchmarkIs(b *testing.B) {
 func BenchmarkVerbose(b *testing.B) {
 	err := errbase.New("error")
 	err = Wrap(err, true)
-	var v errverbose.AppendInterface
-	assert.ErrorAs(b, err, &v)
+	v, _ := assert.ErrorAsType[errverbose.AppendInterface](b, err)
 	var buf []byte
 	for b.Loop() {
 		buf = v.ErrorVerboseAppend(buf)

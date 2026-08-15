@@ -72,8 +72,7 @@ func TestString(t *testing.T) {
 
 func TestStringWrapped(t *testing.T) {
 	err := errmsg.Wrap(errbase.New("error"), "msg")
-	var i Interface
-	assert.ErrorAs(t, err, &i)
+	i, _ := assert.ErrorAsType[Interface](t, err)
 	assert.Equal(t, String(i), "msg: error")
 }
 
@@ -92,8 +91,7 @@ func TestAppendAllocs(t *testing.T) {
 
 func TestStringAllocs(t *testing.T) {
 	err := errmsg.Wrap(errbase.New("error"), "msg")
-	var i Interface
-	assert.ErrorAs(t, err, &i)
+	i, _ := assert.ErrorAsType[Interface](t, err)
 	var res string
 	assert.AllocsPerRun(t, 100, func() {
 		res = String(i)
@@ -110,8 +108,7 @@ func BenchmarkAppend(b *testing.B) {
 
 func BenchmarkString(b *testing.B) {
 	err := errmsg.Wrap(errbase.New("error"), "msg")
-	var i Interface
-	assert.ErrorAs(b, err, &i)
+	i, _ := assert.ErrorAsType[Interface](b, err)
 	for b.Loop() {
 		_ = String(i)
 	}

@@ -55,8 +55,7 @@ func TestError(t *testing.T) {
 func TestVerbose(t *testing.T) {
 	err := errbase.New("error")
 	err = Wrap(err)
-	var v errverbose.AppendInterface
-	assert.ErrorAs(t, err, &v)
+	v, _ := assert.ErrorAsType[errverbose.AppendInterface](t, err)
 	b := v.ErrorVerboseAppend(nil)
 	s := string(b)
 	t.Log(s)
@@ -66,8 +65,7 @@ func TestVerbose(t *testing.T) {
 func TestErrorAppend(t *testing.T) {
 	err := errmsg.Wrap(errbase.New("error"), "msg")
 	err = Wrap(err)
-	var i errappend.Interface
-	assert.ErrorAs(t, err, &i)
+	_, _ = assert.ErrorAsType[errappend.Interface](t, err)
 	b := errappend.Append(nil, err)
 	assert.Equal(t, string(b), "msg: error")
 }
@@ -75,10 +73,10 @@ func TestErrorAppend(t *testing.T) {
 func TestStackFrames(t *testing.T) {
 	err := errbase.New("error")
 	err = Wrap(err)
-	var sErr interface {
+	sErr, _ := assert.ErrorAsType[interface {
+		error
 		StackFrames() []uintptr
-	}
-	assert.ErrorAs(t, err, &sErr)
+	}](t, err)
 	pcs := sErr.StackFrames()
 	assert.SliceNotEmpty(t, pcs)
 }
@@ -138,8 +136,7 @@ func TestFramesAllocs(t *testing.T) {
 func TestVerboseAllocs(t *testing.T) {
 	err := errbase.New("error")
 	err = Wrap(err)
-	var v errverbose.AppendInterface
-	assert.ErrorAs(t, err, &v)
+	v, _ := assert.ErrorAsType[errverbose.AppendInterface](t, err)
 	var b []byte
 	assert.AllocsPerRun(t, 100, func() {
 		b = v.ErrorVerboseAppend(b)
@@ -173,8 +170,7 @@ func BenchmarkFrames(b *testing.B) {
 func BenchmarkVerbose(b *testing.B) {
 	err := errbase.New("error")
 	err = Wrap(err)
-	var v errverbose.AppendInterface
-	assert.ErrorAs(b, err, &v)
+	v, _ := assert.ErrorAsType[errverbose.AppendInterface](b, err)
 	var buf []byte
 	for b.Loop() {
 		buf = v.ErrorVerboseAppend(buf)

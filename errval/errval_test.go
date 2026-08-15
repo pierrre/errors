@@ -62,8 +62,7 @@ func TestError(t *testing.T) {
 func TestVerbose(t *testing.T) {
 	err := errbase.New("error")
 	err = Wrap(err, "foo", "bar")
-	var v errverbose.AppendInterface
-	assert.ErrorAs(t, err, &v)
+	v, _ := assert.ErrorAsType[errverbose.AppendInterface](t, err)
 	b := v.ErrorVerboseAppend(nil)
 	assert.Equal(t, string(b), `value foo = [string] (len=3) "bar"`)
 }
@@ -95,8 +94,7 @@ func TestJoin(t *testing.T) {
 func TestErrorAppend(t *testing.T) {
 	err := errmsg.Wrap(errbase.New("error"), "msg")
 	err = Wrap(err, "foo", "bar")
-	var i errappend.Interface
-	assert.ErrorAs(t, err, &i)
+	_, _ = assert.ErrorAsType[errappend.Interface](t, err)
 	b := errappend.Append(nil, err)
 	assert.Equal(t, string(b), "msg: error")
 }
@@ -136,8 +134,7 @@ func TestGetAllocs(t *testing.T) {
 func TestVerboseAllocs(t *testing.T) {
 	err := errbase.New("error")
 	err = Wrap(err, "foo", "bar")
-	var v errverbose.AppendInterface
-	assert.ErrorAs(t, err, &v)
+	v, _ := assert.ErrorAsType[errverbose.AppendInterface](t, err)
 	var b []byte
 	assert.AllocsPerRun(t, 100, func() {
 		b = v.ErrorVerboseAppend(b)
@@ -257,8 +254,7 @@ func BenchmarkGetValue(b *testing.B) {
 func BenchmarkVerbose(b *testing.B) {
 	err := errbase.New("error")
 	err = Wrap(err, "foo", "bar")
-	var v errverbose.AppendInterface
-	assert.ErrorAs(b, err, &v)
+	v, _ := assert.ErrorAsType[errverbose.AppendInterface](b, err)
 	var buf []byte
 	for b.Loop() {
 		buf = v.ErrorVerboseAppend(buf)
