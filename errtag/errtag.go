@@ -90,6 +90,7 @@ func All(err error) iter.Seq2[string, string] {
 }
 
 // Get returns the tags added to an error.
+// It may return a nil map if there is no value.
 func Get(err error) map[string]string {
 	return erriter.FirstKeys(All(err))
 }

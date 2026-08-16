@@ -65,7 +65,7 @@ func TestFirstKeys(t *testing.T) {
 func TestFirstKeysEmpty(t *testing.T) {
 	seq := func(yield func(string, int) bool) {}
 	m := FirstKeys(seq)
-	assert.MapEmpty(t, m)
+	assert.MapNil(t, m)
 }
 
 func BenchmarkAll(b *testing.B) {

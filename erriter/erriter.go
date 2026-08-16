@@ -48,11 +48,15 @@ func Unwrap(err error) ([]error, error) {
 }
 
 // FirstKeys returns a map built from seq, where the first value is kept for each key.
+// It may return a nil map if there is no value.
 func FirstKeys[V any](seq iter.Seq2[string, V]) map[string]V {
-	m := make(map[string]V)
+	var m map[string]V
 	for k, v := range seq {
 		if _, ok := m[k]; ok {
 			continue
+		}
+		if m == nil {
+			m = make(map[string]V)
 		}
 		m[k] = v
 	}
