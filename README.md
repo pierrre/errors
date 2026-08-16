@@ -84,6 +84,7 @@ See the provided packages as an example:
 - [`erriter`](https://pkg.go.dev/github.com/pierrre/errors/erriter): iterate over an error tree
 - [`errjoin`](https://pkg.go.dev/github.com/pierrre/errors/errjoin): join multiple errors
 - [`errverbose`](https://pkg.go.dev/github.com/pierrre/errors/errverbose): manage error verbose messages
+- [`errslog`](https://pkg.go.dev/github.com/pierrre/errors/errslog): log errors with slog
 
 ## Migrate from the std `errors` package
 

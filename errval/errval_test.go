@@ -140,6 +140,7 @@ func TestVerboseAllocs(t *testing.T) {
 		b = v.ErrorVerboseAppend(b)
 		b = b[:0]
 	}, 0)
+	testSink = b
 }
 
 func ExampleGetValue() {
@@ -260,4 +261,5 @@ func BenchmarkVerbose(b *testing.B) {
 		buf = v.ErrorVerboseAppend(buf)
 		buf = buf[:0]
 	}
+	testSink = buf
 }
