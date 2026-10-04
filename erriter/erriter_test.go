@@ -1,6 +1,7 @@
 package erriter_test
 
 import (
+	"slices"
 	"testing"
 
 	"github.com/pierrre/assert"
@@ -15,6 +16,44 @@ func newTestError() error {
 	err = errors.Join(err, err)
 	err = errmsg.Wrap(err, "test")
 	return err
+}
+
+type multiError struct{ errs []error }
+
+func (m *multiError) Error() string   { return "multi" }
+func (m *multiError) Unwrap() []error { return m.errs }
+
+type cycleError struct{}
+
+func (c *cycleError) Error() string { return "cycle" }
+func (c *cycleError) Unwrap() error { return c }
+
+type cycleJoinError struct{}
+
+func (c *cycleJoinError) Error() string   { return "cycle" }
+func (c *cycleJoinError) Unwrap() []error { return []error{c} }
+
+type cycleAError struct{ b *cycleBError }
+
+func (c *cycleAError) Error() string { return "a" }
+func (c *cycleAError) Unwrap() error { return c.b }
+
+type cycleBError struct{ a *cycleAError }
+
+func (c *cycleBError) Error() string { return "b" }
+func (c *cycleBError) Unwrap() error { return c.a }
+
+// newCyclePair returns two errors that reference each other.
+func newCyclePair() (a *cycleAError, b *cycleBError) {
+	b = &cycleBError{}
+	a = &cycleAError{b: b}
+	a.b.a = a
+	return
+}
+
+// collect returns the sequence of errors yielded by All(err).
+func collect(err error) []error {
+	return slices.Collect(All(err))
 }
 
 func TestAll(t *testing.T) {
@@ -39,25 +78,63 @@ func TestAllStop(t *testing.T) {
 	assert.Equal(t, count, 4)
 }
 
-type cycleError struct{}
+func TestAllNil(t *testing.T) {
+	count := 0
+	for range All(nil) {
+		count++
+	}
+	assert.Equal(t, count, 0)
+}
 
-func (c *cycleError) Error() string { return "cycle" }
-func (c *cycleError) Unwrap() error { return c }
+func TestAllNilChild(t *testing.T) {
+	// A multi error may unwrap to a list containing nil.
+	leaf := errbase.New("leaf")
+	root := &multiError{errs: []error{nil, leaf}}
+	got := collect(root)
+	assert.Equal(t, len(got), 2)
+	assert.Equal(t, got[0], error(root))
+	assert.Equal(t, got[1], leaf)
+}
 
-type cycleJoinError struct{}
+func TestAllOrder(t *testing.T) {
+	a := errbase.New("a")
+	b := errbase.New("b")
+	c := errbase.New("c")
+	wa := errors.Wrap(a, "wa")
+	root := errors.Join(wa, b, c)
+	got := collect(root)
+	// The sequence is: root, its join, then for each child its whole
+	// subtree: the wrapped chain (wa, its stack, a), then b, then c.
+	assert.Equal(t, len(got), 7)
+	assert.Equal(t, got[0], root)
+	assert.Equal(t, got[2], wa)
+	assert.Equal(t, got[4], a)
+	assert.Equal(t, got[5], b)
+	assert.Equal(t, got[6], c)
+}
 
-func (c *cycleJoinError) Error() string   { return "cycle" }
-func (c *cycleJoinError) Unwrap() []error { return []error{c} }
+func TestAllDiamond(t *testing.T) {
+	// A leaf reachable through two different paths is visited once per path.
+	e := errbase.New("e")
+	got := collect(errors.Join(e, e))
+	assert.Equal(t, len(got), 4)
+	assert.Equal(t, got[2], e)
+	assert.Equal(t, got[3], e)
+}
 
-type cycleAError struct{ b *cycleBError }
-
-func (c *cycleAError) Error() string { return "a" }
-func (c *cycleAError) Unwrap() error { return c.b }
-
-type cycleBError struct{ a *cycleAError }
-
-func (c *cycleBError) Error() string { return "b" }
-func (c *cycleBError) Unwrap() error { return c.a }
+func TestAllDeepChain(t *testing.T) {
+	// A long chain must not overflow the stack.
+	const n = 100000
+	err := errbase.New("leaf")
+	for range n {
+		err = errmsg.Wrap(err, "w")
+	}
+	count := 0
+	for range All(err) {
+		count++
+	}
+	assert.Equal(t, count, n+1)
+}
 
 func TestAllCycle(t *testing.T) {
 	count := 0
@@ -76,13 +153,24 @@ func TestAllCycleJoin(t *testing.T) {
 }
 
 func TestAllCyclePair(t *testing.T) {
-	a := &cycleAError{b: &cycleBError{}}
-	a.b.a = a
+	a, _ := newCyclePair()
 	count := 0
 	for range All(a) {
 		count++
 	}
 	assert.Equal(t, count, 2)
+}
+
+func TestAllCycleSibling(t *testing.T) {
+	// A cycle is cut, but iteration continues with the next sibling.
+	a, b := newCyclePair()
+	leaf := errbase.New("leaf")
+	root := errors.Join(a, leaf)
+	got := collect(root)
+	assert.Equal(t, len(got), 5)
+	assert.Equal(t, got[2], error(a))
+	assert.Equal(t, got[3], error(b))
+	assert.Equal(t, got[4], leaf)
 }
 
 func TestAllAllocs(t *testing.T) {
@@ -91,6 +179,14 @@ func TestAllAllocs(t *testing.T) {
 		for range All(err) {
 		}
 	}, 0)
+}
+
+func BenchmarkAll(b *testing.B) {
+	err := newTestError()
+	for b.Loop() {
+		for range All(err) {
+		}
+	}
 }
 
 func TestFirstKeys(t *testing.T) {
@@ -112,12 +208,4 @@ func TestFirstKeysEmpty(t *testing.T) {
 	seq := func(yield func(string, int) bool) {}
 	m := FirstKeys(seq)
 	assert.MapNil(t, m)
-}
-
-func BenchmarkAll(b *testing.B) {
-	err := newTestError()
-	for b.Loop() {
-		for range All(err) {
-		}
-	}
 }
