@@ -39,6 +39,52 @@ func TestAllStop(t *testing.T) {
 	assert.Equal(t, count, 4)
 }
 
+type cycleError struct{}
+
+func (c *cycleError) Error() string { return "cycle" }
+func (c *cycleError) Unwrap() error { return c }
+
+type cycleJoinError struct{}
+
+func (c *cycleJoinError) Error() string   { return "cycle" }
+func (c *cycleJoinError) Unwrap() []error { return []error{c} }
+
+type cycleAError struct{ b *cycleBError }
+
+func (c *cycleAError) Error() string { return "a" }
+func (c *cycleAError) Unwrap() error { return c.b }
+
+type cycleBError struct{ a *cycleAError }
+
+func (c *cycleBError) Error() string { return "b" }
+func (c *cycleBError) Unwrap() error { return c.a }
+
+func TestAllCycle(t *testing.T) {
+	count := 0
+	for range All(&cycleError{}) {
+		count++
+	}
+	assert.Equal(t, count, 1)
+}
+
+func TestAllCycleJoin(t *testing.T) {
+	count := 0
+	for range All(&cycleJoinError{}) {
+		count++
+	}
+	assert.Equal(t, count, 1)
+}
+
+func TestAllCyclePair(t *testing.T) {
+	a := &cycleAError{b: &cycleBError{}}
+	a.b.a = a
+	count := 0
+	for range All(a) {
+		count++
+	}
+	assert.Equal(t, count, 2)
+}
+
 func TestAllAllocs(t *testing.T) {
 	err := newTestError()
 	assert.AllocsPerRun(t, 100, func() {

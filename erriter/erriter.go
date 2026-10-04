@@ -3,33 +3,50 @@ package erriter
 
 import (
 	"iter"
+
+	"github.com/pierrre/go-libs/syncutil"
 )
+
+var seenPool = &syncutil.Pool[map[error]struct{}]{
+	New: func() map[error]struct{} {
+		return make(map[error]struct{}, 8)
+	},
+}
+
+func releaseSeen(seen map[error]struct{}) {
+	clear(seen)
+	seenPool.Put(seen)
+}
 
 // All returns an [iter.Seq] that iterates over an error tree recursively.
 func All(err error) iter.Seq[error] {
 	return func(yield func(error) bool) {
-		iterFunc(err, func(err error) bool {
-			return yield(err)
-		})
+		seen := seenPool.Get()
+		defer releaseSeen(seen)
+		iterFunc(err, yield, seen)
 	}
 }
 
-func iterFunc(err error, f func(err error) bool) bool {
-	for err != nil {
-		ok := f(err)
-		if !ok {
+func iterFunc(err error, f func(err error) bool, seen map[error]struct{}) bool {
+	if err == nil {
+		return true
+	}
+	if _, ok := seen[err]; ok {
+		return true // cycle
+	}
+	seen[err] = struct{}{}
+	defer delete(seen, err)
+
+	if !f(err) {
+		return false
+	}
+	errs, next := Unwrap(err)
+	for _, e := range errs {
+		if !iterFunc(e, f, seen) {
 			return false
 		}
-		var errs []error
-		errs, err = Unwrap(err)
-		for _, err := range errs {
-			ok := iterFunc(err, f)
-			if !ok {
-				return false
-			}
-		}
 	}
-	return true
+	return iterFunc(next, f, seen)
 }
 
 // Unwrap unwraps an error.

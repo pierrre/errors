@@ -107,6 +107,24 @@ func TestNil(t *testing.T) {
 	assert.Equal(t, s, "<nil>\n")
 }
 
+type cycleError struct{}
+
+func (c *cycleError) Error() string { return "cycle" }
+func (c *cycleError) Unwrap() error { return c }
+
+func TestStringCycle(t *testing.T) {
+	assert.Equal(t, String(&cycleError{}), "cycle\n")
+}
+
+type cycleJoinError struct{}
+
+func (c *cycleJoinError) Error() string   { return "cycle" }
+func (c *cycleJoinError) Unwrap() []error { return []error{c} }
+
+func TestStringCycleJoin(t *testing.T) {
+	assert.Equal(t, String(&cycleJoinError{}), "cycle\n")
+}
+
 func TestJoin(t *testing.T) {
 	err := &testVerboseError{
 		error: std_errors.Join(

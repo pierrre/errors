@@ -41,6 +41,17 @@ var depthPool = syncutil.Pool[*[]int]{
 	},
 }
 
+var seenPool = &syncutil.Pool[map[error]struct{}]{
+	New: func() map[error]struct{} {
+		return make(map[error]struct{}, 8)
+	},
+}
+
+func releaseSeen(seen map[error]struct{}) {
+	clear(seen)
+	seenPool.Put(seen)
+}
+
 // Write writes the error's verbose message to the writer.
 //
 // The first line is the error's message.
@@ -49,6 +60,8 @@ func Write(w io.Writer, err error) {
 	depthP := depthPool.Get()
 	defer depthPool.Put(depthP)
 	depth := (*depthP)[:0]
+	seen := seenPool.Get()
+	defer releaseSeen(seen)
 	bw, ok := w.(*bytesutil.Writer)
 	if !ok {
 		bw = bytesWriterPool.Get()
@@ -57,27 +70,52 @@ func Write(w io.Writer, err error) {
 			bytesWriterPool.Put(bw)
 		}()
 	}
-	write(bw, err, depth)
+	write(bw, err, depth, seen)
 }
 
-func write(bw *bytesutil.Writer, err error, depth []int) {
-	writeSub(bw, depth)
+func write(bw *bytesutil.Writer, err error, depth []int, seen map[error]struct{}) {
 	if err == nil {
+		writeSub(bw, depth)
 		bw.AppendString("<nil>\n")
 		return
 	}
+	if _, ok := seen[err]; ok {
+		return // cycle
+	}
+	writeSub(bw, depth)
+	seen[err] = struct{}{}
+	defer delete(seen, err)
 	*bw = errappend.Append(*bw, err)
 	bw.AppendByte('\n')
-	for ; err != nil; err = writeNext(bw, err, depth) {
-		switch v := err.(type) { //nolint:errorlint // We want to check for specific error types.
-		case Interface:
-			bw.AppendString(v.ErrorVerbose())
-			bw.AppendByte('\n')
-		case AppendInterface:
-			*bw = v.ErrorVerboseAppend(*bw)
-			bw.AppendByte('\n')
-		}
+	writeVerbose(bw, err, depth, seen)
+}
+
+func writeVerbose(bw *bytesutil.Writer, err error, depth []int, seen map[error]struct{}) {
+	switch v := err.(type) { //nolint:errorlint // We want to check for specific error types.
+	case Interface:
+		bw.AppendString(v.ErrorVerbose())
+		bw.AppendByte('\n')
+	case AppendInterface:
+		*bw = v.ErrorVerboseAppend(*bw)
+		bw.AppendByte('\n')
 	}
+	errs, next := erriter.Unwrap(err)
+	for i, e := range errs {
+		write(bw, e, append(depth, i), seen)
+	}
+	writeChain(bw, next, depth, seen)
+}
+
+func writeChain(bw *bytesutil.Writer, err error, depth []int, seen map[error]struct{}) {
+	if err == nil {
+		return
+	}
+	if _, ok := seen[err]; ok {
+		return // cycle
+	}
+	seen[err] = struct{}{}
+	defer delete(seen, err)
+	writeVerbose(bw, err, depth, seen)
 }
 
 func writeSub(bw *bytesutil.Writer, depth []int) {
@@ -92,14 +130,6 @@ func writeSub(bw *bytesutil.Writer, depth []int) {
 		*bw = strconv.AppendInt(*bw, int64(d), 10)
 	}
 	bw.AppendString(": ")
-}
-
-func writeNext(bw *bytesutil.Writer, err error, depth []int) error {
-	errs, err := erriter.Unwrap(err)
-	for i, e := range errs {
-		write(bw, e, append(depth, i))
-	}
-	return err
 }
 
 var bytesWriterPool = &bytesutil.WriterPool{}
