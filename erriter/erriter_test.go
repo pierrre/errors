@@ -60,8 +60,8 @@ func TestAll(t *testing.T) {
 	err := newTestError()
 	count := 0
 	for err := range All(err) {
-		count++
 		assert.Error(t, err)
+		count++
 	}
 	assert.Equal(t, count, 5)
 }
@@ -69,7 +69,8 @@ func TestAll(t *testing.T) {
 func TestAllStop(t *testing.T) {
 	err := newTestError()
 	count := 0
-	for range All(err) {
+	for err := range All(err) {
+		assert.Error(t, err)
 		count++
 		if count == 4 {
 			break
@@ -80,7 +81,8 @@ func TestAllStop(t *testing.T) {
 
 func TestAllNil(t *testing.T) {
 	count := 0
-	for range All(nil) {
+	for err := range All(nil) {
+		assert.Error(t, err)
 		count++
 	}
 	assert.Equal(t, count, 0)
@@ -130,7 +132,8 @@ func TestAllDeepChain(t *testing.T) {
 		err = errmsg.Wrap(err, "w")
 	}
 	count := 0
-	for range All(err) {
+	for err := range All(err) {
+		assert.Error(t, err)
 		count++
 	}
 	assert.Equal(t, count, n+1)
@@ -138,7 +141,8 @@ func TestAllDeepChain(t *testing.T) {
 
 func TestAllCycle(t *testing.T) {
 	count := 0
-	for range All(&cycleError{}) {
+	for err := range All(&cycleError{}) {
+		assert.Error(t, err)
 		count++
 	}
 	assert.Equal(t, count, 1)
@@ -146,7 +150,8 @@ func TestAllCycle(t *testing.T) {
 
 func TestAllCycleJoin(t *testing.T) {
 	count := 0
-	for range All(&cycleJoinError{}) {
+	for err := range All(&cycleJoinError{}) {
+		assert.Error(t, err)
 		count++
 	}
 	assert.Equal(t, count, 1)
@@ -155,7 +160,8 @@ func TestAllCycleJoin(t *testing.T) {
 func TestAllCyclePair(t *testing.T) {
 	a, _ := newCyclePair()
 	count := 0
-	for range All(a) {
+	for err := range All(a) {
+		assert.Error(t, err)
 		count++
 	}
 	assert.Equal(t, count, 2)
@@ -176,7 +182,8 @@ func TestAllCycleSibling(t *testing.T) {
 func TestAllAllocs(t *testing.T) {
 	err := newTestError()
 	assert.AllocsPerRun(t, 100, func() {
-		for range All(err) {
+		for err := range All(err) {
+			_ = err
 		}
 	}, 0)
 }
@@ -184,7 +191,8 @@ func TestAllAllocs(t *testing.T) {
 func BenchmarkAll(b *testing.B) {
 	err := newTestError()
 	for b.Loop() {
-		for range All(err) {
+		for err := range All(err) {
+			_ = err
 		}
 	}
 }
